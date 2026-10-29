@@ -62,10 +62,10 @@ As salas e suas localizações são ilustrativas. O protótipo não representa u
 
 | Parte | Escolha inicial |
 | --- | --- |
-| Interface e lógica de servidor | Next.js com React e JavaScript |
-| Estilização | CSS Modules |
-| Banco de dados NoSQL | MongoDB Atlas |
-| Autenticação | Sessão em cookie HttpOnly; biblioteca e estratégia a definir na implementação |
+| Interface e lógica de servidor | A definir |
+| Estilização | A definir |
+| Banco de dados | A definir |
+| Autenticação | A definir |
 
 Essas tecnologias são o planejamento inicial e ainda não estão configuradas neste repositório.
 
