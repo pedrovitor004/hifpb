@@ -1,0 +1,10 @@
+const {test}=require('node:test');const assert=require('node:assert/strict');
+const {parse,overlaps,assertNoConflicts,assertScope}=require('../src/domain');
+const lesson={courseId:'ads',classId:'ads-4',subjectId:'bd2',professorId:'gildo',roomId:'b-204',weekday:2,startTime:'18:30',endTime:'20:10',validFrom:'2026-07-01',validTo:'2026-12-31',semester:'2026.2'};
+test('horário final deve ser posterior ao inicial',()=>{for(const endTime of ['18:30','18:00'])assert.throws(()=>parse('lessons',{...lesson,endTime}));});
+test('rejeita campos desconhecidos, datas impossíveis e dia inválido',()=>{assert.throws(()=>parse('lessons',{...lesson,status:'published'}));assert.throws(()=>parse('lessons',{...lesson,validFrom:'2026-02-30'}));assert.throws(()=>parse('lessons',{...lesson,weekday:8}));});
+test('conflito verifica professor, sala e turma',()=>{for(const field of ['professorId','roomId','classId']){const other={...lesson,id:'other',professorId:'p2',roomId:'r2',classId:'c2',[field]:lesson[field]};assert.throws(()=>assertNoConflicts(lesson,[other]));}});
+test('intervalos adjacentes, dias distintos e vigências diferentes são permitidos',()=>{assert.equal(overlaps(lesson,{...lesson,startTime:'20:10',endTime:'22:10'}),false);assert.equal(overlaps(lesson,{...lesson,weekday:3}),false);assert.equal(overlaps(lesson,{...lesson,validFrom:'2027-01-01',validTo:'2027-12-31'}),false);});
+test('interseção de vigência precisa conter ocorrência do dia recorrente',()=>{assert.equal(overlaps({...lesson,validFrom:'2026-10-20',validTo:'2026-10-28'},{...lesson,validFrom:'2026-10-28',validTo:'2026-11-03'}),false);});
+test('edição ignora apenas a própria identidade',()=>{assert.doesNotThrow(()=>assertNoConflicts(lesson,[{...lesson,id:'same'}],'same'));});
+test('escopo de curso e catálogos compartilhados são protegidos',()=>{assert.throws(()=>assertScope({courseIds:['ads']},{courseId:'civil'}));assert.throws(()=>assertScope({courseIds:['ads']},{name:'Sala'}));assert.doesNotThrow(()=>assertScope({courseIds:[]},{name:'Sala'}));});
