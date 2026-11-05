@@ -1,0 +1,27 @@
+{
+  "name": "hifpb",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "build": "npm run build -w backend && npm run build -w frontend",
+    "test": "npm run test -w backend",
+    "emulators": "firebase emulators:start --project demo-hifpb --import .emulator-data --export-on-exit .emulator-data",
+    "seed": "npm run seed -w backend",
+    "coordinator": "npm run coordinator -w backend",
+    "test:integration": "node tests/local-integration.cjs",
+    "test:ui": "playwright test presentation.spec.js",
+    "capture": "node tests/capture.cjs",
+    "format": "prettier --write frontend/src tests",
+    "test:local": "node tests/local-integration.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "concurrently": "^9.2.0",
+    "firebase-tools": "^15.35.0",
+    "prettier": "^3.9.10"
+  }
+}

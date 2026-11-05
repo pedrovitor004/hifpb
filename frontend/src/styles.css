@@ -1,0 +1,191 @@
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+@theme {
+  --font-sans: "Inter", sans-serif;
+  --color-brand: #064e3b;
+  --color-ink: #172b25;
+  --color-muted: #4a7c64;
+  --color-line: #c7ddd4;
+  --color-canvas: #f0f7f4;
+  --color-surface: #f8fbf9;
+  --color-panel: #ffffff;
+  --color-action: #064e3b;
+  --radius-card: 16px;
+  --radius-control: 10px;
+  --shadow-card: 0 2px 8px -4px rgb(6 78 59 / 10%);
+  --shadow-float:
+    0 12px 40px -8px rgb(6 78 59 / 18%), 0 2px 8px rgb(23 43 37 / 4%);
+  --spacing-sidebar: 240px;
+  --spacing-sidebar-small: 80px;
+}
+.dark {
+  color-scheme: dark;
+  --color-brand: #9ee5c5;
+  --color-ink: #e7f1eb;
+  --color-muted: #a3bdaf;
+  --color-line: #2c473b;
+  --color-canvas: #0c1c15;
+  --color-surface: #14291f;
+  --color-panel: #192f24;
+  --color-action: #0b6248;
+  --shadow-card: 0 2px 8px -4px rgb(0 0 0 / 28%);
+  --shadow-float: 0 12px 40px -8px rgb(0 0 0 / 45%);
+}
+@layer base {
+  body {
+    @apply m-0 bg-canvas font-sans text-sm text-ink antialiased;
+  }
+  ::selection {
+    @apply bg-emerald-200 text-brand;
+  }
+  button,
+  a,
+  input,
+  select,
+  textarea {
+    @apply focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-700;
+  }
+  button {
+    @apply cursor-pointer disabled:cursor-wait disabled:opacity-50;
+  }
+  input,
+  select,
+  textarea {
+    @apply w-full min-w-0 rounded-control border border-line bg-panel px-3 py-2.5 text-[13px] text-ink transition-colors placeholder:text-muted/65 hover:border-muted/60 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/10 disabled:bg-canvas disabled:text-muted;
+  }
+  input:user-invalid,
+  textarea:user-invalid {
+    @apply border-red-400;
+  }
+  label {
+    @apply flex flex-col gap-1.5 text-xs font-medium;
+  }
+  h1 {
+    @apply text-2xl leading-tight font-bold tracking-[-0.025em] sm:text-[28px];
+  }
+  h2 {
+    @apply text-lg font-bold;
+  }
+  h3 {
+    @apply text-base font-bold;
+  }
+}
+/* SweetAlert renders outside the React root; use the same semantic theme. */
+.swal2-popup.hifpb-modal {
+  @apply rounded-card border border-line bg-panel text-ink shadow-float;
+  font-family: var(--font-sans);
+}
+.swal2-popup .swal2-title {
+  @apply text-xl tracking-tight;
+}
+.swal2-popup .swal2-html-container {
+  @apply text-sm leading-6 text-muted;
+}
+.swal2-popup .swal2-styled {
+  @apply rounded-control px-5 py-3 text-[13px] font-semibold;
+}
+.swal2-popup .swal2-close {
+  @apply text-muted;
+}
+.swal2-popup.swal2-toast {
+  @apply border-line p-4;
+}
+.swal2-popup.swal2-toast .swal2-title {
+  @apply text-[13px] font-semibold leading-5;
+}
+.swal2-popup.swal2-toast .swal2-timer-progress-bar {
+  @apply bg-emerald-500/60;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+  :root,
+  .dark {
+    --color-ink: #111;
+    --color-muted: #444;
+    --color-line: #ccc;
+    --color-panel: #fff;
+    --color-canvas: #fff;
+    --color-surface: #f4f4f4;
+    --color-brand: #064e3b;
+    color-scheme: light;
+  }
+  body {
+    background: #fff;
+    font-size: 10pt;
+  }
+  aside,
+  header,
+  footer,
+  .no-print,
+  body > a,
+  #main > :not(.schedule-print-root) {
+    display: none !important;
+  }
+  #main,
+  #main > .schedule-print-root {
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+  .schedule-print-root .schedule-list {
+    border: 0;
+    box-shadow: none;
+  }
+  .schedule-list .overflow-x-auto {
+    overflow: visible !important;
+  }
+  .schedule-list table {
+    width: 100%;
+    min-width: 0;
+    border-collapse: collapse;
+  }
+  .schedule-list thead {
+    display: table-header-group;
+  }
+  .schedule-list tr {
+    break-inside: avoid;
+  }
+  .schedule-list th,
+  .schedule-list td {
+    padding: 8px;
+  }
+  .schedule-list th:last-child,
+  .schedule-list td:last-child {
+    display: none;
+  }
+}
+/* SweetAlert lives outside React; preserve the product's strong green. */
+.swal2-popup .swal2-icon.swal2-success {
+  border-color: #064e3b;
+  color: #064e3b;
+}
+.swal2-popup .swal2-success [class^='swal2-success-line'] { background-color: #064e3b; }
+.swal2-popup .swal2-success .swal2-success-ring { border-color: rgb(6 78 59 / 28%); }
+.swal2-popup .swal2-timer-progress-bar { background-color: #064e3b; }
+.swal2-popup .hifpb-confirm { background-color: #064e3b; color: white; }
+.swal2-popup .hifpb-confirm:focus-visible { outline: 3px solid #4a7c64; outline-offset: 3px; }
+.swal2-popup.hifpb-public-notice { width: min(800px, calc(100vw - 24px)); padding-bottom: 1.5rem; }
+.swal2-popup.hifpb-public-notice .swal2-title { font-size: clamp(1.3rem, 3vw, 1.8rem); }
+.swal2-popup.hifpb-public-notice .hifpb-notice-content { max-height: 55vh; overflow-y: auto; margin: 1.25rem; }
+@media (max-height: 740px) {
+  .hifpb-sidebar { padding-top: 12px; padding-bottom: 12px; }
+  .hifpb-sidebar > div:first-of-type > a > img { height: 48px; }
+  .hifpb-sidebar > div:first-of-type > a > span { display: none; }
+  .hifpb-sidebar nav { margin-top: 8px; }
+}
