@@ -183,10 +183,17 @@ export default function App() {
             aria-hidden="true"
           />
         )}
+        <div className={`sticky top-0 z-40 h-dvh w-0 shrink-0 transition-[width] duration-200 motion-reduce:transition-none ${collapsed ? "md:w-0" : "md:w-sidebar"}`}>
+          <div
+            id="desktop-navigation"
+            aria-hidden={collapsed && !mobileOpen}
+            inert={collapsed && !mobileOpen}
+            className={mobileOpen ? "" : "h-full overflow-hidden"}
+          >
         <aside
           ref={side}
           id="main-navigation"
-          className={`hifpb-sidebar ${mobileOpen ? "fixed inset-y-0 left-0 z-50 flex w-sidebar overflow-y-auto shadow-float" : "sticky top-0 hidden overflow-visible md:flex"} h-dvh shrink-0 flex-col justify-between border-r border-line bg-panel px-4 py-4 transition-[width] duration-200 ${collapsed && !mobileOpen ? "md:w-sidebar-small" : "md:w-sidebar"}`}
+          className={`hifpb-sidebar ${mobileOpen ? "fixed inset-y-0 left-0 z-50 flex overflow-y-auto shadow-float" : "hidden md:flex"} h-dvh w-sidebar shrink-0 flex-col justify-between border-r border-line bg-panel px-4 py-4`}
           aria-label="Menu principal"
         >
           {mobileOpen && (
@@ -234,7 +241,6 @@ export default function App() {
               </div>)}
             </nav>
           </div>
-          <button onClick={()=>setCollapsed(v=>!v)} title={collapsed?'Expandir menu':'Recolher menu'} aria-label={collapsed?'Expandir menu':'Recolher menu'} aria-controls="main-navigation" aria-expanded={!collapsed} className="my-auto hidden size-8 shrink-0 self-center items-center justify-center rounded-lg border border-line bg-canvas text-muted transition hover:border-brand/30 hover:bg-brand/5 hover:text-brand focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:flex"><Icon name={collapsed?'right':'left'} size={17}/></button>
           <div className="mt-3 space-y-3">
             {(!collapsed || mobileOpen) ? (
               <div className="border-t border-line pt-3">
@@ -252,6 +258,21 @@ export default function App() {
             ) : <Link to={user ? "/admin" : "/entrar"} title={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} aria-label={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} className="mx-auto flex size-11 items-center justify-center rounded-xl border border-line bg-canvas text-brand transition hover:bg-action hover:text-white"><Icon name="lock"/></Link>}
           </div>
         </aside>
+          </div>
+          <button
+            type="button"
+            onClick={() => setCollapsed(v => !v)}
+            aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+            aria-expanded={!collapsed}
+            aria-controls="desktop-navigation"
+            className="absolute left-full top-1/2 hidden h-36 w-5 -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-action bg-action text-white shadow-sm transition-colors hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:flex"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className={`h-4 w-4 transition-transform motion-reduce:transition-none ${collapsed ? "rotate-180" : ""}`}>
+              <path d="m14 7-5 5 5 5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="relative z-20 flex min-h-[72px] items-center justify-between gap-3 border-b-[11px] border-muted bg-panel px-4 lg:px-8">
             <div className="flex min-w-0 items-center gap-2 text-muted">
