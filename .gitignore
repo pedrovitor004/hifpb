@@ -12,3 +12,5 @@ serviceAccount*.json
 playwright-report/
 test-results/
 /tmp/
+
+backend/data/uploads/
