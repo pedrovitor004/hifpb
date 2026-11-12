@@ -352,6 +352,7 @@ test("acesso da coordenação tem formulário responsivo e autenticação preser
   await expect(
     page.getByRole("heading", { name: "Painel da coordenação", exact: true }),
   ).toBeVisible();
+  await expect(page.locator(".swal2-toast")).toContainText("Login realizado com sucesso!");
   await page.getByRole("button", { name: "Abrir menu", exact: true }).click();
   await expect(
     page.getByRole("navigation", {

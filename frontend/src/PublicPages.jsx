@@ -13,6 +13,7 @@ import {
   SubjectIcon,
   CourseIcon,
   confirmClearFilters,
+  success,
 } from "./components";
 import Modal from "./Modal";
 import Brand, { CoordinatorAccess } from "./Brand";
@@ -340,6 +341,7 @@ export function AccessPage() {
       await signInWithEmailAndPassword(auth, email.trim(), password);
       await api("/auth/me");
       navigate("/admin", { replace: true });
+      success("Login realizado com sucesso!");
     } catch (e) {
       await signOut(auth).catch(() => {});
       setFailure(

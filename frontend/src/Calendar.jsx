@@ -21,7 +21,7 @@ export default function Calendar() {
   if (!calendar) return <Empty>Nenhum calendário disponível.</Empty>;
   const integrated = scope === "integrados";
   const url = documentUrl(calendar.documentId),
-    page = calendar.startPage || 1;
+    page = calendar.startPage || 5;
   const events = calendarEvents
     .filter((e) => e.calendarId === calendar.id)
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
