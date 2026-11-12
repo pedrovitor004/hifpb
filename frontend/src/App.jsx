@@ -27,7 +27,7 @@ import {
   dateLabel,
   publicNotices,
 } from "./components";
-import { StartPage, NoticePage, AccessPage, SubjectPage } from "./PublicPages";
+import { NoticePage, AccessPage, SubjectPage } from "./PublicPages";
 import { RoomDirectory, ProfessorDirectory } from "./Directories";
 import Admin from "./Admin";
 import RefinedSchedule from "./Schedule";
@@ -38,7 +38,6 @@ import Calendar from "./Calendar";
 const DataContext = createContext(null);
 export const useData = () => useContext(DataContext);
 const nav = [
-  ["/", "Início", "home"],
   ["/horarios", "Horários", "schedule"],
   ["/salas", "Salas", "rooms"],
   ["/professores", "Professores", "professors"],
@@ -209,7 +208,7 @@ export default function App() {
             </button>
           )}
           <div>
-            <Link to="/" className="flex flex-col items-center gap-1.5">
+            <Link to="/horarios" className="flex flex-col items-center gap-1.5">
               <img
                 src="/assets/69c80.png"
                 alt="HIFPB — Consulta de horários e salas"
@@ -231,14 +230,14 @@ export default function App() {
               )}
             </Link>
             <nav className="mt-4 flex flex-col gap-1" aria-label="Páginas da plataforma">
-              {nav.filter(([path])=>['/','/horarios'].includes(path)).map(([path,label,icon])=><NavLink key={path} to={path} end={path==='/'} title={label} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive||(path==='/horarios'&&loc.pathname.startsWith('/aulas'))?'bg-action text-white':'text-muted hover:bg-canvas'}`}><Icon name={icon}/>{(!collapsed||mobileOpen)&&<span>{label}</span>}</NavLink>)}
+              {nav.filter(([path])=>path==='/horarios').map(([path,label,icon])=><NavLink key={path} to={path} title={label} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive||(path==='/horarios'&&loc.pathname.startsWith('/aulas'))?'bg-sidebar-selected text-brand':'text-muted hover:bg-canvas'}`}><Icon name={icon}/>{(!collapsed||mobileOpen)&&<span>{label}</span>}</NavLink>)}
               {[
                 ['academic','Acadêmico','graduation',['/disciplinas','/professores','/salas','/calendario']],
               ].map(([key,label,icon,paths])=><div key={key} className="group/nav relative">
                 <button title={collapsed&&!mobileOpen?label:undefined} aria-label={collapsed&&!mobileOpen?label:undefined} aria-expanded={navGroup===key} aria-controls={'nav-'+key} onClick={()=>{if(collapsed&&!mobileOpen)setNavGroup(navGroup===key?null:key);else setNavGroup(navGroup===key?null:key);}} className={`flex h-10 w-full items-center gap-3 rounded-xl text-[13px] font-medium transition hover:bg-canvas ${collapsed&&!mobileOpen?'justify-center px-0':'px-3'} ${paths.includes(loc.pathname)?'text-brand':'text-muted'}`}><Icon name={icon}/>{(!collapsed||mobileOpen)&&<><span>{label}</span><span className={`ml-auto transition-transform ${navGroup===key?'rotate-180':''}`}><Icon name="down" size={15}/></span></>}</button>
-                {navGroup===key&&<div id={'nav-'+key} className={collapsed&&!mobileOpen?'absolute left-[calc(100%+12px)] top-0 z-[70] w-52 space-y-1 rounded-xl border border-line bg-panel p-2 shadow-float':'ml-5 mt-1 space-y-1 border-l border-line pl-3'}>{paths.map(path=>{const [,itemLabel,itemIcon]=nav.find(n=>n[0]===path);return <NavLink key={path} to={path} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-9 items-center gap-2.5 rounded-lg px-3 text-xs font-medium transition ${isActive?'bg-action text-white':'text-muted hover:bg-canvas'}`}><Icon name={itemIcon} size={16}/>{itemLabel}{path==='/avisos'&&notices.length>0&&<span aria-hidden="true" className="ml-auto rounded-full bg-action px-1.5 text-[10px] text-white">{notices.length}</span>}</NavLink>;})}</div>}
+                {navGroup===key&&<div id={'nav-'+key} className={collapsed&&!mobileOpen?'absolute left-[calc(100%+12px)] top-0 z-[70] w-52 space-y-1 rounded-xl border border-line bg-panel p-2 shadow-float':'ml-5 mt-1 space-y-1 border-l border-line pl-3'}>{paths.map(path=>{const [,itemLabel,itemIcon]=nav.find(n=>n[0]===path);return <NavLink key={path} to={path} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-9 items-center gap-2.5 rounded-lg px-3 text-xs font-medium transition ${isActive?'bg-sidebar-selected text-brand':'text-muted hover:bg-canvas'}`}><Icon name={itemIcon} size={16}/>{itemLabel}{path==='/avisos'&&notices.length>0&&<span aria-hidden="true" className="ml-auto rounded-full bg-action px-1.5 text-[10px] text-white">{notices.length}</span>}</NavLink>;})}</div>}
               </div>)}
-              <NavLink to="/avisos" title="Avisos" onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive?'bg-action text-white':'text-muted hover:bg-canvas'}`}>
+              <NavLink to="/avisos" title="Avisos" onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive?'bg-sidebar-selected text-brand':'text-muted hover:bg-canvas'}`}>
                 <Icon name="notices"/>
                 {(!collapsed||mobileOpen)&&<><span>Avisos</span>{notices.length>0&&<span aria-hidden="true" className="ml-auto rounded-full bg-canvas px-1.5 text-[10px] text-brand">{notices.length}</span>}</>}
               </NavLink>
@@ -249,16 +248,16 @@ export default function App() {
               <div className="border-t border-line pt-3">
                 <div className="overflow-hidden rounded-2xl border border-line bg-panel shadow-card">
                   <div className="flex items-center gap-3 bg-canvas/70 px-3 py-3">
-                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-action text-white shadow-sm"><Icon name="lock" size={19}/></span>
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sidebar-selected text-brand shadow-sm"><Icon name="lock" size={19}/></span>
                     <div><p className="text-xs font-semibold text-ink">{user ? "Coordenação" : "Área do coordenador"}</p><p className="mt-1 text-[10px] text-muted">Gestão acadêmica</p></div>
                   </div>
                   <div className="space-y-2 p-3">
-                    <Link to={user ? "/admin" : "/entrar"} className="group flex min-h-11 items-center justify-between gap-2 rounded-xl bg-action px-3.5 py-3 text-xs font-semibold text-white transition hover:bg-emerald-900 hover:shadow-md"><span>{user ? "Abrir painel" : "Entrar"}</span><span className="transition-transform group-hover:translate-x-0.5"><Icon name="open" size={16}/></span></Link>
-                    {user && <button onClick={async()=>{await signOut(auth);navigate("/");}} className="flex min-h-9 w-full items-center justify-center gap-2 rounded-lg text-[11px] font-medium text-muted transition hover:bg-canvas hover:text-brand"><Icon name="logout" size={15}/>Sair da conta</button>}
+                    <Link to={user ? "/admin" : "/entrar"} className="group flex min-h-11 items-center justify-between gap-2 rounded-xl bg-canvas px-3.5 py-3 text-xs font-semibold text-brand transition hover:bg-canvas/80 hover:shadow-md"><span>{user ? "Abrir painel" : "Entrar"}</span><span className="transition-transform group-hover:translate-x-0.5"><Icon name="open" size={16}/></span></Link>
+                    {user && <button onClick={async()=>{await signOut(auth);navigate("/horarios");}} className="flex min-h-9 w-full items-center justify-center gap-2 rounded-lg text-[11px] font-medium text-muted transition hover:bg-canvas hover:text-brand"><Icon name="logout" size={15}/>Sair da conta</button>}
                   </div>
                 </div>
               </div>
-            ) : <Link to={user ? "/admin" : "/entrar"} title={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} aria-label={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} className="mx-auto flex size-11 items-center justify-center rounded-xl border border-line bg-canvas text-brand transition hover:bg-action hover:text-white"><Icon name="lock"/></Link>}
+            ) : <Link to={user ? "/admin" : "/entrar"} title={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} aria-label={user ? "Abrir painel da coordenação" : "Entrar como coordenador"} className="mx-auto flex size-11 items-center justify-center rounded-xl border border-line bg-canvas text-brand transition hover:bg-canvas/80"><Icon name="lock"/></Link>}
           </div>
         </aside>
           </div>
@@ -269,7 +268,7 @@ export default function App() {
             title={collapsed ? "Expandir menu" : "Recolher menu"}
             aria-expanded={!collapsed}
             aria-controls="desktop-navigation"
-            className="absolute left-full top-1/2 hidden h-36 w-5 -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-action bg-action text-white shadow-sm transition-colors hover:bg-emerald-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:flex"
+            className="absolute left-full top-1/2 hidden h-36 w-5 -translate-y-1/2 items-center justify-center rounded-r-md border border-l-0 border-line bg-white text-[#064e3b] shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand md:flex"
           >
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true" className={`h-4 w-4 transition-transform motion-reduce:transition-none ${collapsed ? "rotate-180" : ""}`}>
               <path d="m14 7-5 5 5 5" strokeLinecap="round" strokeLinejoin="round" />
@@ -356,7 +355,7 @@ export default function App() {
           <main
             id="main"
             tabIndex={-1}
-            className={`min-w-0 flex-1 p-4 outline-none sm:p-6 ${loc.pathname === "/horarios" ? "lg:px-4" : "lg:px-8"} ${loc.pathname === "/" ? "lg:py-5" : "lg:py-7"}`}
+            className={`min-w-0 flex-1 p-4 outline-none sm:p-6 lg:px-8 lg:py-7`}
           >
             {failure ? (
               <ErrorState message={failure} retry={load} />
@@ -364,7 +363,7 @@ export default function App() {
               <Loading />
             ) : (
               <Routes>
-                <Route path="/" element={<StartPage />} />
+                <Route path="/" element={<Navigate to="/horarios" replace />} />
                 <Route path="/horarios" element={<RefinedSchedule />} />
                 <Route path="/aulas/:id" element={<RefinedLesson />} />
                 <Route path="/salas" element={<RoomDirectory />} />
@@ -379,7 +378,7 @@ export default function App() {
                   element={
                     <Card>
                       <h1>Página não encontrada</h1>
-                      <Link to="/">Voltar ao início</Link>
+                      <Link to="/horarios">Ir para horários</Link>
                     </Card>
                   }
                 />

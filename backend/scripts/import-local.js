@@ -3,11 +3,13 @@ const path=require('node:path');
 const {assertNoConflicts}=require('../src/domain');
 const manifest=require('../data/academic-2026.json');
 const integratedCalendar=require('../data/calendar-integrados-2026.json');
+const subjectColors=require('../data/subject-colors.json');
 // Presentation scope: ADS only, preserving the complete source manifest and PDFs.
-manifest.version+='-ads-v1-'+integratedCalendar.version;
+manifest.version+='-ads-v1-'+integratedCalendar.version+'-colors-v1';
 manifest.courses=manifest.courses.filter(c=>c.id==='ads');
 manifest.classes=manifest.classes.filter(c=>c.courseId==='ads');
 manifest.subjects=manifest.subjects.filter(s=>s.courseId==='ads');
+manifest.subjects=manifest.subjects.map(s=>({...s,color:subjectColors[s.id]||s.color}));
 const classIds=new Set(manifest.classes.map(c=>c.id)),subjectIds=new Set(manifest.subjects.map(s=>s.id));
 manifest.lessons=manifest.lessons.filter(l=>(l.classIds||[l.classId]).some(id=>classIds.has(id))).map(l=>{
  const groups=(l.classIds||[l.classId]).filter(id=>classIds.has(id)),subjects=(l.subjectIds||[l.subjectId]).filter(id=>subjectIds.has(id));
