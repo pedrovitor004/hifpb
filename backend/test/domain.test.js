@@ -20,4 +20,11 @@ test('conflito verifica professor, sala e turma',()=>{for(const field of ['profe
 test('intervalos adjacentes, dias distintos e vigências diferentes são permitidos',()=>{assert.equal(overlaps(lesson,{...lesson,startTime:'20:10',endTime:'22:10'}),false);assert.equal(overlaps(lesson,{...lesson,weekday:3}),false);assert.equal(overlaps(lesson,{...lesson,validFrom:'2027-01-01',validTo:'2027-12-31'}),false);});
 test('interseção de vigência precisa conter ocorrência do dia recorrente',()=>{assert.equal(overlaps({...lesson,validFrom:'2026-10-20',validTo:'2026-10-28'},{...lesson,validFrom:'2026-10-28',validTo:'2026-11-03'}),false);});
 test('edição ignora apenas a própria identidade',()=>{assert.doesNotThrow(()=>assertNoConflicts(lesson,[{...lesson,id:'same'}],'same'));});
+test('conflito inclui professores e turmas adicionais entre cursos',()=>{
+ const other={...lesson,id:'other',courseId:'outro',classId:'c2',professorId:'p2',roomId:'r2'};
+ assert.throws(()=>assertNoConflicts({...lesson,professorIds:['p2']},[other]),/Professor/);
+ assert.throws(()=>assertNoConflicts({...lesson,classIds:['c2']},[other]),/Turma/);
+ assert.throws(()=>assertNoConflicts({...lesson,classId:'c3',professorId:'p3',roomId:'r2'},[other]),/Sala/);
+ assert.doesNotThrow(()=>assertNoConflicts({...lesson,roomId:null},[{...other,roomId:null}]));
+});
 test('escopo de curso e catálogos compartilhados são protegidos',()=>{assert.throws(()=>assertScope({courseIds:['ads']},{courseId:'civil'}));assert.throws(()=>assertScope({courseIds:['ads']},{name:'Sala'}));assert.doesNotThrow(()=>assertScope({courseIds:[]},{name:'Sala'}));});
