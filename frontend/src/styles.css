@@ -319,6 +319,44 @@
   .schedule-list td:last-child {
     display: none;
   }
+  .schedule-grid,
+  .schedule-grid .overflow-x-auto {
+    overflow: visible !important;
+    box-shadow: none;
+  }
+  .schedule-grid table {
+    min-width: 0 !important;
+    width: 100%;
+  }
+  .schedule-grid thead {
+    display: table-header-group;
+  }
+  .schedule-grid tr,
+  .schedule-lesson {
+    break-inside: avoid;
+  }
+  .schedule-grid th,
+  .schedule-grid td {
+    padding: 4px;
+  }
+  .schedule-grid th:first-child {
+    width: 16mm;
+  }
+  .schedule-lesson {
+    min-height: 0 !important;
+    padding: 6px;
+    color: #16382c !important;
+    background: color-mix(in srgb, var(--lesson-color) 55%, white) !important;
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+  .schedule-lesson strong {
+    font-size: 10pt;
+  }
+  .schedule-lesson span {
+    font-size: 8pt;
+    margin-top: 3px;
+  }
 }
 /* SweetAlert lives outside React; preserve the product's strong green. */
 .swal2-popup .swal2-icon.swal2-success {
