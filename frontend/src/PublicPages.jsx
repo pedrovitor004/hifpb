@@ -17,6 +17,7 @@ import {
 import Modal from "./Modal";
 import Brand, { CoordinatorAccess } from "./Brand";
 import CourseTour from "./CourseTour";
+const tourSeenKey = "hifpb-tour-seen-v1";
 
 export function StartPage() {
   const {
@@ -26,8 +27,19 @@ export function StartPage() {
     user,
     selectionRequired,
   } = useData();
-  const [showTour, setShowTour] = useState(true);
+  const [showTour, setShowTour] = useState(() => {
+    try {
+      return localStorage.getItem(tourSeenKey) !== "true";
+    } catch {
+      return true;
+    }
+  });
   function closeTour() {
+    try {
+      localStorage.setItem(tourSeenKey, "true");
+    } catch {
+      // Permite fechar o guia mesmo quando o armazenamento está bloqueado.
+    }
     setShowTour(false);
     requestAnimationFrame(() =>
       document.querySelector("#course-options button")?.focus(),

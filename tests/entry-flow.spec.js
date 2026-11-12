@@ -18,6 +18,61 @@ function trackAcademic(page) {
   return requests;
 }
 
+for (const action of ["Pular apresentação", "Fechar janela", "concluir"]) {
+  test(`tutorial aparece uma vez ao ${action} e permite reabertura manual`, async ({
+    page,
+    context,
+  }) => {
+    await page.goto("/");
+    const tour = page.getByRole("dialog", {
+      name: "Sua consulta começa pelo curso",
+      exact: true,
+    });
+    await expect(tour).toBeVisible();
+    if (action === "concluir") {
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await tour
+        .getByRole("button", { name: "Ir para etapa 3", exact: true })
+        .click();
+      await tour
+        .getByRole("button", { name: "Escolher meu curso", exact: true })
+        .click();
+    } else {
+      await tour.getByRole("button", { name: action, exact: true }).click();
+    }
+    await expect(tour).toHaveCount(0);
+    expect(
+      await page.evaluate(() => localStorage.getItem("hifpb-tour-seen-v1")),
+    ).toBe("true");
+    await page.reload();
+    await expect(
+      page.getByRole("heading", { name: "Qual é o seu curso?", exact: true }),
+    ).toBeVisible();
+    await expect(tour).toHaveCount(0);
+    const nextPage = await context.newPage();
+    await nextPage.goto("/");
+    await expect(
+      nextPage.getByRole("heading", {
+        name: "Qual é o seu curso?",
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      nextPage.getByRole("dialog", {
+        name: "Sua consulta começa pelo curso",
+        exact: true,
+      }),
+    ).toHaveCount(0);
+    await nextPage.close();
+    await page
+      .getByRole("button", { name: "Como funciona", exact: true })
+      .click();
+    await expect(tour).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(tour).toHaveCount(0);
+  });
+}
+
 test("apresentação explica o fluxo sem carregar dados antes da seleção", async ({
   page,
 }) => {
@@ -133,10 +188,7 @@ test("apresentação explica o fluxo sem carregar dados antes da seleção", asy
   await page
     .getByRole("link", { name: "Selecionar curso", exact: true })
     .click();
-  await expect(tour).toBeVisible();
-  await page
-    .getByRole("button", { name: "Pular apresentação", exact: true })
-    .click();
+  await expect(tour).toHaveCount(0);
   await expect(page.getByRole("alert")).toContainText("Selecione um curso");
   await page
     .getByRole("button")
@@ -152,10 +204,7 @@ test("apresentação explica o fluxo sem carregar dados antes da seleção", asy
     requests.every((url) => url.searchParams.get("courseId") === "ads"),
   ).toBe(true);
   await page.goto("/");
-  await expect(tour).toBeVisible();
-  await page
-    .getByRole("button", { name: "Pular apresentação", exact: true })
-    .click();
+  await expect(tour).toHaveCount(0);
   await page
     .getByRole("button", { name: "Como funciona", exact: true })
     .click();
@@ -167,13 +216,11 @@ test("apresentação explica o fluxo sem carregar dados antes da seleção", asy
     "ads",
   );
   requests.length = 0;
-  const chosen = page
-    .getByRole("button")
-    .filter({
-      has: page.getByText("Análise e Desenvolvimento de Sistemas", {
-        exact: true,
-      }),
-    });
+  const chosen = page.getByRole("button").filter({
+    has: page.getByText("Análise e Desenvolvimento de Sistemas", {
+      exact: true,
+    }),
+  });
   await expect(chosen).toHaveAttribute("aria-pressed", "true");
   await chosen.click();
   await expect(chosen).toHaveAttribute("aria-pressed", "false");
