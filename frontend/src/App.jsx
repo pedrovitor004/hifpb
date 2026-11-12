@@ -320,7 +320,7 @@ export default function App() {
           />
         )}
         <div
-          className={`sticky top-0 z-40 h-dvh w-0 shrink-0 transition-[width] duration-200 motion-reduce:transition-none ${collapsed ? "md:w-0" : "md:w-sidebar"}`}
+          className={`no-print sticky top-0 z-40 h-dvh w-0 shrink-0 transition-[width] duration-200 motion-reduce:transition-none ${collapsed ? "md:w-0" : "md:w-sidebar"}`}
         >
           <div
             id="desktop-navigation"
