@@ -13,7 +13,7 @@ const schemas = {
   lessons: z.object({ courseId: id, classId: id, classIds:z.array(id).max(10).optional(),subjectId: id,subjectIds:z.array(id).max(10).optional(), professorId: id.nullable().default(null), professorIds:z.array(id).max(10).optional(), roomId: id.nullable().default(null), weekday: z.number().int().min(1).max(5), startTime: time, endTime: time, validFrom: date, validTo: date.nullable().default(null), semester: text, description: z.string().max(2000).default('') }).strict(),
   notices: z.object({ title: text, message: z.string().trim().min(1).max(5000), category: z.enum(['informacao','alteracao','cancelamento']).default('informacao'), courseId: id.default('ads') }).strict(),
   calendars:z.object({title:text,year:z.number().int().min(2000).max(2100),version:text,documentId:id,scope:z.enum(['superiores','integrados','tecnicos','todos']),validFrom:date,validTo:date,approvalDate:date}).strict(),
-  calendarEvents:z.object({calendarId:id,title:text,startDate:date,endDate:date,category:z.enum(['aulas','avaliacao','feriado','evento','recesso','prazo'])}).strict(),
+  calendarEvents:z.object({calendarId:id,title:text,startDate:date,endDate:date,category:z.enum(['aulas','avaliacao','feriado','evento','recesso','prazo']),bimester:z.number().int().min(1).max(4).optional()}).strict(),
 };
 function parse(type, input) {
   const r = schemas[type]?.safeParse(input);

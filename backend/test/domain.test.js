@@ -1,6 +1,19 @@
 const {test}=require('node:test');const assert=require('node:assert/strict');
 const {parse,overlaps,assertNoConflicts,assertScope}=require('../src/domain');
 const lesson={courseId:'ads',classId:'ads-4',subjectId:'bd2',professorId:'gildo',roomId:'b-204',weekday:2,startTime:'18:30',endTime:'20:10',validFrom:'2026-07-01',validTo:'2026-12-31',semester:'2026.2'};
+test('calendário integrado tem eventos válidos e quatro bimestres',()=>{
+ const data=require('../data/calendar-integrados-2026.json');
+ const {id,...calendar}=data.calendar;
+ assert.equal(parse('calendars',calendar).scope,'integrados');
+ const events=data.events.map(([startDate,title,category,endDate,bimester])=>parse('calendarEvents',{calendarId:id,startDate,endDate:endDate||startDate,title,category,...(bimester?{bimester}:{})}));
+ assert.deepEqual([...new Set(events.map(e=>e.bimester).filter(Boolean))].sort(),[1,2,3,4]);
+ assert.ok(events.some(e=>e.bimester===1&&e.startDate==='2026-03-02'));
+ assert.ok(events.some(e=>e.bimester===4&&e.startDate==='2027-01-02'));
+ assert.ok(events.every(e=>e.bimester));
+ assert.ok(events.some(e=>e.bimester===1&&e.startDate==='2026-02-16'));
+ assert.ok(events.some(e=>e.bimester===2&&e.startDate==='2026-07-27'));
+ for(const bimester of [0,5,1.5])assert.throws(()=>parse('calendarEvents',{...events[0],bimester}));
+});
 test('horário final deve ser posterior ao inicial',()=>{for(const endTime of ['18:30','18:00'])assert.throws(()=>parse('lessons',{...lesson,endTime}));});
 test('rejeita campos desconhecidos, datas impossíveis e dia inválido',()=>{assert.throws(()=>parse('lessons',{...lesson,status:'published'}));assert.throws(()=>parse('lessons',{...lesson,validFrom:'2026-02-30'}));assert.throws(()=>parse('lessons',{...lesson,weekday:8}));});
 test('conflito verifica professor, sala e turma',()=>{for(const field of ['professorId','roomId','classId']){const other={...lesson,id:'other',professorId:'p2',roomId:'r2',classId:'c2',[field]:lesson[field]};assert.throws(()=>assertNoConflicts(lesson,[other]));}});
