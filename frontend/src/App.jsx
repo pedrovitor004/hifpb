@@ -57,7 +57,7 @@ export default function App() {
     pop = useRef(null),
     bell = useRef(null);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [navGroup,setNavGroup]=useState(()=>['/salas','/professores','/disciplinas'].includes(loc.pathname)?'academic':['/calendario','/avisos'].includes(loc.pathname)?'communication':null);
+  const [navGroup,setNavGroup]=useState(()=>['/salas','/professores','/disciplinas','/calendario'].includes(loc.pathname)?'academic':null);
   const announcementShown=useRef(false);
   const publicPage=!loc.pathname.startsWith('/admin')&&loc.pathname!=='/entrar';
   const notices=(data?.notices||[]).filter(n=>n.status!=='draft').slice().sort((a,b)=>(b.updatedAt?._seconds||b.createdAt?._seconds||0)-(a.updatedAt?._seconds||a.createdAt?._seconds||0));
@@ -233,12 +233,15 @@ export default function App() {
             <nav className="mt-4 flex flex-col gap-1" aria-label="Páginas da plataforma">
               {nav.filter(([path])=>['/','/horarios'].includes(path)).map(([path,label,icon])=><NavLink key={path} to={path} end={path==='/'} title={label} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive||(path==='/horarios'&&loc.pathname.startsWith('/aulas'))?'bg-action text-white':'text-muted hover:bg-canvas'}`}><Icon name={icon}/>{(!collapsed||mobileOpen)&&<span>{label}</span>}</NavLink>)}
               {[
-                ['academic','Acadêmico','graduation',['/disciplinas','/professores','/salas']],
-                ['communication','Comunicados','bell',['/calendario','/avisos']],
+                ['academic','Acadêmico','graduation',['/disciplinas','/professores','/salas','/calendario']],
               ].map(([key,label,icon,paths])=><div key={key} className="group/nav relative">
                 <button title={collapsed&&!mobileOpen?label:undefined} aria-label={collapsed&&!mobileOpen?label:undefined} aria-expanded={navGroup===key} aria-controls={'nav-'+key} onClick={()=>{if(collapsed&&!mobileOpen)setNavGroup(navGroup===key?null:key);else setNavGroup(navGroup===key?null:key);}} className={`flex h-10 w-full items-center gap-3 rounded-xl text-[13px] font-medium transition hover:bg-canvas ${collapsed&&!mobileOpen?'justify-center px-0':'px-3'} ${paths.includes(loc.pathname)?'text-brand':'text-muted'}`}><Icon name={icon}/>{(!collapsed||mobileOpen)&&<><span>{label}</span><span className={`ml-auto transition-transform ${navGroup===key?'rotate-180':''}`}><Icon name="down" size={15}/></span></>}</button>
                 {navGroup===key&&<div id={'nav-'+key} className={collapsed&&!mobileOpen?'absolute left-[calc(100%+12px)] top-0 z-[70] w-52 space-y-1 rounded-xl border border-line bg-panel p-2 shadow-float':'ml-5 mt-1 space-y-1 border-l border-line pl-3'}>{paths.map(path=>{const [,itemLabel,itemIcon]=nav.find(n=>n[0]===path);return <NavLink key={path} to={path} onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-9 items-center gap-2.5 rounded-lg px-3 text-xs font-medium transition ${isActive?'bg-action text-white':'text-muted hover:bg-canvas'}`}><Icon name={itemIcon} size={16}/>{itemLabel}{path==='/avisos'&&notices.length>0&&<span aria-hidden="true" className="ml-auto rounded-full bg-action px-1.5 text-[10px] text-white">{notices.length}</span>}</NavLink>;})}</div>}
               </div>)}
+              <NavLink to="/avisos" title="Avisos" onClick={()=>setMobileOpen(false)} className={({isActive})=>`flex h-10 shrink-0 items-center gap-3 rounded-xl text-[13px] font-medium transition ${collapsed&&!mobileOpen?'justify-center':'px-3'} ${isActive?'bg-action text-white':'text-muted hover:bg-canvas'}`}>
+                <Icon name="notices"/>
+                {(!collapsed||mobileOpen)&&<><span>Avisos</span>{notices.length>0&&<span aria-hidden="true" className="ml-auto rounded-full bg-canvas px-1.5 text-[10px] text-brand">{notices.length}</span>}</>}
+              </NavLink>
             </nav>
           </div>
           <div className="mt-3 space-y-3">
