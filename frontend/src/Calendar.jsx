@@ -2,27 +2,28 @@
 import { useData } from "./App";
 import { Title, Card, Button, Icon, Empty, Select } from "./components";
 import { currentBimester } from "./calendarPeriod";
+import { currentCalendar, defaultCalendarLinks } from "./calendarConfig";
+import { documentUrl } from "./firebase";
 export default function Calendar() {
-  const { calendars = [], calendarEvents = [] } = useData(),
+  const {
+      calendars = [],
+      calendarEvents = [],
+      courses,
+      selectedCourseId,
+    } = useData(),
     [view, setView] = useState(true),
-    [scope, setScope] = useState("superiores"),
+    scope =
+      courses.find((c) => c.id === selectedCourseId)?.level === "integrado"
+        ? "integrados"
+        : "superiores",
     [selectedBimester, setSelectedBimester] = useState(null);
-  const sorted = calendars
-    .filter((c) => c.scope === scope)
-    .slice()
-    .sort((a, b) => b.approvalDate.localeCompare(a.approvalDate));
-  const calendar = sorted[0];
+  const calendar = currentCalendar(calendars, scope);
   if (!calendar) return <Empty>Nenhum calendário disponível.</Empty>;
   const integrated = scope === "integrados";
-  const url = integrated
-    ? "/documents/calendario-academico-integrados-2026.pdf"
-    : "/documents/calendario-academico-2026.pdf";
+  const url = documentUrl(calendar.documentId),
+    page = calendar.startPage || 1;
   const events = calendarEvents
-    .filter(
-      (e) =>
-        e.calendarId === calendar.id &&
-        (integrated || e.startDate >= "2026-08-01"),
-    )
+    .filter((e) => e.calendarId === calendar.id)
     .sort((a, b) => a.startDate.localeCompare(b.startDate));
   const bimester = selectedBimester ?? String(currentBimester(events));
   const visibleEvents = integrated
@@ -34,19 +35,6 @@ export default function Calendar() {
         title="Calendário acadêmico"
         subtitle="Datas letivas, avaliações e documentos do Campus Monteiro."
       />
-      <div className="no-print mb-5 max-w-sm">
-        <Select
-          label="Tipo de curso"
-          value={scope}
-          onChange={(e) => {
-            setScope(e.target.value);
-            setView(true);
-          }}
-        >
-          <option value="superiores">Cursos superiores</option>
-          <option value="integrados">Cursos integrados</option>
-        </Select>
-      </div>
       <Card>
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
@@ -58,8 +46,8 @@ export default function Calendar() {
             <h2 className="mt-4 text-lg">{calendar.title}</h2>
             <p className="mt-2 text-xs text-muted">
               {integrated
-                ? "Calendário acadêmico 2026 • Cursos integrados"
-                : "Resolução nº 6/2026 • Aprovada em 01/06/2026 • Cursos superiores"}
+                ? `Calendário acadêmico ${calendar.year} • Cursos integrados`
+                : `Versão ${calendar.version} • Aprovada em ${calendar.approvalDate.split("-").reverse().join("/")}`}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -68,7 +56,7 @@ export default function Calendar() {
               {view ? "Ocultar PDF" : "Visualizar PDF"}
             </Button>
             <a
-              href={url + "#page=5"}
+              href={url + `#page=${page}`}
               target="_blank"
               rel="noreferrer"
               className="rounded-control bg-action px-4 py-3 text-xs font-semibold text-white"
@@ -87,9 +75,9 @@ export default function Calendar() {
         {view && (
           <div className="mt-5 overflow-hidden rounded-xl border border-line">
             <iframe
-              key={scope}
-              title={`Calendário acadêmico 2026 em PDF — ${integrated ? "Cursos integrados" : "Cursos superiores"}`}
-              src={url + "#page=5"}
+              key={calendar.documentId}
+              title={`Calendário acadêmico ${calendar.year} em PDF — ${integrated ? "Cursos integrados" : "Cursos superiores"}`}
+              src={url + `#page=${page}`}
               className="h-[65vh] min-h-[440px] w-full"
             />
             <p className="bg-canvas p-3 text-xs text-muted">
@@ -102,14 +90,14 @@ export default function Calendar() {
       <div className="mt-5 grid gap-5 lg:grid-cols-[1.4fr_1fr]">
         <Card>
           <h2 className="mb-4">
-            {integrated ? "Datas por bimestre" : "Datas do segundo semestre"}
+            {integrated ? "Datas por bimestre" : "Datas do calendário"}
           </h2>
           {!events.length && (
             <p className="mb-4 text-xs leading-6 text-muted">
               Consulte as datas no PDF acima.
             </p>
           )}
-          {integrated && (
+          {integrated && events.length > 0 && (
             <div className="mb-4 max-w-sm">
               <Select
                 label="Bimestre"
@@ -131,27 +119,25 @@ export default function Calendar() {
         </Card>
         <Card>
           <h2 className="mb-4">Documentos de consulta</h2>
-          {[
-            ["turmas-2026-10-27", "Horários por turma"],
-            ["professores-2026-10-27", "Horários por professor"],
-          ].map(([id, title]) => (
-            <a
-              key={id}
-              href={"/documents/" + id + ".pdf"}
-              target="_blank"
-              rel="noreferrer"
-              className="mb-3 flex items-center justify-between rounded-xl border border-line p-4 text-sm font-semibold text-brand transition hover:bg-canvas"
-            >
-              {title}
-              <Icon name="open" />
-            </a>
-          ))}
-          <p className="mt-4 text-xs leading-6 text-muted">
-            Os documentos foram preservados conforme recebidos. Os horários não
-            incluem a identificação das salas. O cabeçalho do arquivo por
-            professor indica 2026.1; essa indicação deve ser conferida com a
-            coordenação.
-          </p>
+          {(calendar.links ?? defaultCalendarLinks).map(
+            ({ url: linkUrl, label }, index) => (
+              <a
+                key={index}
+                href={linkUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="mb-3 flex items-center justify-between rounded-xl border border-line p-4 text-sm font-semibold text-brand transition hover:bg-canvas"
+              >
+                {label}
+                <Icon name="open" />
+              </a>
+            ),
+          )}
+          {calendar.description && (
+            <p className="mt-4 whitespace-pre-wrap text-xs leading-6 text-muted">
+              {calendar.description}
+            </p>
+          )}
         </Card>
       </div>
     </>

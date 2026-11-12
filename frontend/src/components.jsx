@@ -37,6 +37,9 @@ import {
   ChevronRight,
   Printer,
   MoveUpRight,
+  Music2,
+  Eye,
+  EyeOff,
 } from "lucide-react";
 import {
   FlaskConical,
@@ -66,20 +69,34 @@ const modal = Swal.mixin({
   },
   returnFocus: true,
 });
-export function publicNotices(notices) {
-  const content=document.createElement('div');
-  content.className='space-y-4 text-left';
-  for(const notice of notices){
-    const article=document.createElement('article');
-    const tone=notice.category==='cancelamento'?{border:'border-l-rose-600',badge:'bg-rose-100 text-rose-800',label:'Cancelamento'}:notice.category==='alteracao'?{border:'border-l-amber-500',badge:'bg-amber-100 text-amber-900',label:'Alteração'}:{border:'border-l-emerald-700',badge:'bg-emerald-100 text-emerald-900',label:'Informação'};
-    article.className=`rounded-xl border border-line border-l-4 ${tone.border} bg-canvas p-5`;
-    const date=document.createElement('p');date.className='mb-2 text-[11px] font-semibold text-muted';date.textContent='Coordenação • '+dateLabel(notice.createdAt);
-    const category=document.createElement('span');category.className=`mb-3 inline-flex rounded-full px-2.5 py-1 text-[10px] font-bold ${tone.badge}`;category.textContent=tone.label;
-    const title=document.createElement('h3');title.className='mb-3 text-lg font-semibold text-ink';title.textContent=notice.title;
-    const message=document.createElement('p');message.className='whitespace-pre-wrap break-words text-sm leading-7 text-ink';message.textContent=notice.message;
-    article.append(date,category,title,message);content.append(article);
-  }
-  return modal.fire({title:'Avisos da coordenação',html:content,width:800,icon:'info',confirmButtonText:'Entendi',showCloseButton:true,customClass:{popup:'hifpb-modal hifpb-public-notice',htmlContainer:'hifpb-notice-content',confirmButton:'hifpb-confirm'},allowOutsideClick:false});
+export function publicNotices(count) {
+  const content = document.createElement("div");
+  content.className = "notice-dialog-content";
+  const badge = document.createElement("span");
+  badge.className = "notice-dialog-count";
+  badge.textContent = `${count} ${count === 1 ? "aviso disponível" : "avisos disponíveis"}`;
+  const message = document.createElement("p");
+  message.textContent =
+    "Confira os comunicados da coordenação para o seu curso.";
+  content.append(badge, message);
+  return modal.fire({
+    title: "Avisos da coordenação",
+    html: content,
+    icon: "info",
+    iconHtml:
+      '<svg width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>',
+    width: 460,
+    showCancelButton: true,
+    showCloseButton: true,
+    confirmButtonText: "Ver avisos",
+    cancelButtonText: "Agora não",
+    reverseButtons: true,
+    customClass: {
+      popup: "hifpb-modal hifpb-notice-summary",
+      confirmButton: "hifpb-confirm",
+      cancelButton: "hifpb-notice-later",
+    },
+  });
 }
 export const alert = (message, title = "Informação") =>
   modal.fire({
@@ -115,6 +132,7 @@ export const confirmClearFilters = async () =>
 export const success = (text) =>
   modal.fire({
     toast: true,
+    returnFocus: false,
     position: "top-end",
     title: text,
     icon: "success",
@@ -135,17 +153,97 @@ export const error = (e) =>
     confirmButtonText: "Entendi",
   });
 export async function chooseSubjectColor(currentColor) {
+  const initial = /^#[0-9a-f]{6}$/i.test(currentColor)
+    ? currentColor
+    : "#b9cdf8";
+  const content = document.createElement("div");
+  content.className = "subject-color-picker";
+  const controls = document.createElement("div");
+  controls.className = "subject-color-controls";
+  const visualLabel = document.createElement("label");
+  visualLabel.textContent = "Escolha visual";
+  const visual = document.createElement("input");
+  visual.type = "color";
+  visual.value = initial;
+  visual.setAttribute("aria-label", "Escolher cor visualmente");
+  visualLabel.append(visual);
+  const hexLabel = document.createElement("label");
+  hexLabel.textContent = "Código hexadecimal";
+  const hex = document.createElement("input");
+  hex.type = "text";
+  hex.value = initial.toUpperCase();
+  hex.maxLength = 7;
+  hex.placeholder = "#B9CDF8";
+  hex.spellcheck = false;
+  hex.setAttribute("aria-label", "Código hexadecimal");
+  hexLabel.append(hex);
+  const preview = document.createElement("div");
+  preview.className = "subject-color-preview";
+  preview.textContent = "Prévia da disciplina";
+  function setColor(value) {
+    visual.value = value;
+    hex.value = value.toUpperCase();
+    preview.style.backgroundColor = value;
+    const rgb = [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16));
+    preview.style.color =
+      rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114 > 150
+        ? "#16382c"
+        : "#ffffff";
+  }
+  visual.addEventListener("input", () => {
+    setColor(visual.value);
+    Swal.resetValidationMessage();
+  });
+  hex.addEventListener("input", () => {
+    hex.value = hex.value.toUpperCase();
+    if (/^#[0-9a-f]{6}$/i.test(hex.value)) {
+      setColor(hex.value);
+      Swal.resetValidationMessage();
+    }
+  });
+  const presets = document.createElement("div");
+  presets.className = "subject-color-presets";
+  presets.setAttribute("aria-label", "Cores sugeridas");
+  for (const color of [
+    "#B9CDF8",
+    "#BDF5D5",
+    "#F6DDA8",
+    "#F6C7C7",
+    "#DCCBF5",
+    "#AFE0EA",
+  ]) {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.style.backgroundColor = color;
+    button.setAttribute("aria-label", `Usar cor ${color}`);
+    button.addEventListener("click", () => {
+      setColor(color);
+      Swal.resetValidationMessage();
+    });
+    presets.append(button);
+  }
+  controls.append(visualLabel, hexLabel);
+  content.append(controls, presets, preview);
+  setColor(initial);
   const result = await modal.fire({
     title: "Cor da disciplina",
-    text: "Escolha a nova cor. Ela será usada na lista e nos horários da disciplina.",
-    input: "color",
-    inputValue: /^#[0-9a-f]{6}$/i.test(currentColor) ? currentColor : "#064e3b",
-    inputLabel: "Nova cor",
-    inputAttributes: { "aria-label": "Selecionar cor da disciplina" },
+    html: content,
+    width: 440,
     showCancelButton: true,
     confirmButtonText: "Usar esta cor",
     cancelButtonText: "Cancelar",
-    focusCancel: true,
+    focusConfirm: false,
+    didOpen: () => hex.focus(),
+    preConfirm: () => {
+      const color = hex.value.trim();
+      if (!/^#[0-9a-f]{6}$/i.test(color)) {
+        Swal.showValidationMessage(
+          "Digite # seguido de 6 caracteres hexadecimais (0–9, A–F).",
+        );
+        return false;
+      }
+      return color.toUpperCase();
+    },
   });
   return result.isConfirmed ? result.value : null;
 }
@@ -192,6 +290,8 @@ const icons = {
 };
 export function Icon({ name, active = false, size = 18 }) {
   const actions = {
+    eye: Eye,
+    eyeOff: EyeOff,
     close: X,
     filter: SlidersHorizontal,
     info: Info,
@@ -213,6 +313,7 @@ export function Icon({ name, active = false, size = 18 }) {
     classroom: Presentation,
     courseAds: CodeXml,
     courseCivil: HardHat,
+    courseMusic: Music2,
     database: Database,
     language: Languages,
     math: Calculator,
@@ -280,9 +381,13 @@ export function CourseIcon({ course, ...props }) {
   return (
     <Icon
       name={
-        /civil/i.test(course?.code || course?.name || course || "")
-          ? "courseCivil"
-          : "courseAds"
+        /musical|^im$/i.test(course?.code || course?.name || course || "")
+          ? "courseMusic"
+          : /civil|edifica|edifícios|^ted$|^tce$/i.test(
+                course?.code || course?.name || course || "",
+              )
+            ? "courseCivil"
+            : "courseAds"
       }
       {...props}
     />

@@ -2,6 +2,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth, connectAuthEmulator, onAuthStateChanged as firebaseObserve, signInWithEmailAndPassword as firebaseLogin, signOut as firebaseLogout } from 'firebase/auth';
 const env=import.meta.env;
 export const localMode=env.VITE_AUTH_MODE!=='firebase'&&env.VITE_USE_EMULATORS!=='true';
+export const documentUrl=id=>`${localMode?'/api':env.VITE_API_URL||'http://127.0.0.1:3001/api'}/documents/${encodeURIComponent(id)}/content`;
 const listeners=new Set();
 export const auth=localMode?{currentUser:null}:getAuth(initializeApp({apiKey:env.VITE_FIREBASE_API_KEY,authDomain:env.VITE_FIREBASE_AUTH_DOMAIN,projectId:env.VITE_FIREBASE_PROJECT_ID}));
 if(!localMode&&env.VITE_USE_EMULATORS==='true')connectAuthEmulator(auth,env.VITE_AUTH_EMULATOR_URL||'http://127.0.0.1:9099',{disableWarnings:true});

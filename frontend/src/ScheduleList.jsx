@@ -2,12 +2,22 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Icon, RoomIcon, SubjectIcon, days } from "./components";
 import { resolve } from "./Schedule";
-export default function ScheduleList({ lessons, data, params }) {
+import { LessonNoticeIndicator } from "./NoticeDetails";
+import { currentWeekDates, lessonNotice } from "./lessonNotices";
+export default function ScheduleList({
+  lessons,
+  data,
+  params,
+  dates = currentWeekDates(),
+  onOpenNotice,
+}) {
   return (
     <div className="schedule-list overflow-hidden rounded-card border border-line bg-panel shadow-card">
       <div className="overflow-x-auto">
         <table className="w-full min-w-[700px] text-left">
-          <caption className="sr-only">Lista de aulas da semana</caption>
+          <caption className="sr-only">
+            Lista de aulas de segunda a sexta
+          </caption>
           <thead className="bg-surface text-[10px] uppercase tracking-wider text-muted">
             <tr>
               {[
@@ -37,7 +47,18 @@ export default function ScheduleList({ lessons, data, params }) {
                   a.startTime.localeCompare(b.startTime),
               )
               .map((l) => {
-                const { subject, professor, room } = resolve(data, l, params.get("courseId"));
+                const { subject, professor, room } = resolve(
+                  data,
+                  l,
+                  params.get("courseId"),
+                );
+                const notice = lessonNotice(
+                  data.notices,
+                  l.id,
+                  dates[l.weekday - 1],
+                );
+                const details = new URLSearchParams(params);
+                details.set("date", dates[l.weekday - 1]);
                 return (
                   <tr
                     key={l.id}
@@ -59,6 +80,11 @@ export default function ScheduleList({ lessons, data, params }) {
                           {subject?.name}
                         </span>
                       </div>
+                      <LessonNoticeIndicator
+                        notice={notice}
+                        subject={subject?.code || subject?.name}
+                        onOpen={onOpenNotice}
+                      />
                     </td>
                     <td className="px-4 py-4 text-xs text-muted">
                       {professor?.name}
@@ -74,7 +100,7 @@ export default function ScheduleList({ lessons, data, params }) {
                     </td>
                     <td className="px-4 py-4">
                       <Link
-                        to={`/aulas/${l.id}?${params}`}
+                        to={`/aulas/${l.id}?${details}`}
                         aria-label={`Detalhes de ${subject?.code}, ${days[l.weekday - 1]}, ${l.startTime}`}
                         className="flex size-8 items-center justify-center rounded-lg border border-line text-brand hover:bg-canvas"
                       >
