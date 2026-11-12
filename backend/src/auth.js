@@ -15,12 +15,12 @@ class CoordinatorGuard {
     const snap = await db.collection('users').doc(decoded.uid).get();
     const profile = snap.data();
     if(!profile?.active || profile.role !== 'coordinator') throw new ForbiddenException('Acesso exclusivo de coordenadores autorizados.');
-    req.coordinator = { uid: decoded.uid, email: decoded.email, ...profile };
+    req.coordinator = { uid: decoded.uid, email: decoded.email, ...profile, courseIds: [] };
     return true;
   }
 }
 Injectable()(CoordinatorGuard);
-class AuthController { me(req) { return { uid: req.coordinator.uid, email: req.coordinator.email, role: req.coordinator.role, courseIds: req.coordinator.courseIds || [] }; } }
+class AuthController { me(req) { return { uid: req.coordinator.uid, email: req.coordinator.email, role: req.coordinator.role, courseIds: [] }; } }
 Controller('auth')(AuthController);
 Get('me')(AuthController.prototype,'me',Object.getOwnPropertyDescriptor(AuthController.prototype,'me'));
 Req()(AuthController.prototype,'me',0);

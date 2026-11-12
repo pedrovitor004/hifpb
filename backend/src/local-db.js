@@ -2,7 +2,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const crypto = require('node:crypto');
-const file = path.resolve(__dirname, '../data/local/database.json');
+const file = path.resolve(process.env.HIFPB_DATA_FILE || path.join(__dirname, '../data/local/database.json'));
 let state = fs.existsSync(file) ? JSON.parse(fs.readFileSync(file, 'utf8')) : {};
 let queue = Promise.resolve();
 function revive(value) {
