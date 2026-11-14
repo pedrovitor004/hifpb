@@ -23,6 +23,7 @@ import {
 } from "./components";
 import Modal from "./Modal";
 import CalendarAdmin from "./CalendarAdmin";
+import CoordinatorTour from "./CoordinatorTour";
 import ChangeNotice from "./ChangeNotice";
 import {
   categories,
@@ -141,6 +142,15 @@ export default function Admin() {
     [period, setPeriod] = useState("");
   const [filtersCleared, setFiltersCleared] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [showTour, setShowTour] = useState(false);
+  const [tourSeen, setTourSeen] = useState(false);
+  function openTour() {
+    setShowTour(true);
+    setTourSeen(true);
+    try {
+      localStorage.setItem("hifpb-coordinator-tour-seen-v1", "true");
+    } catch {}
+  }
   async function refreshDrafts() {
     setDrafts(await api("/drafts"));
   }
@@ -458,6 +468,20 @@ export default function Admin() {
           Ver consulta pública
         </Link>
       </div>
+      {tab === "lessons" && (
+        <div className="mb-4 flex justify-end">
+          <button
+            type="button"
+            aria-label="Como criar um horário"
+            onClick={openTour}
+            className={`coordinator-guide ${tourSeen ? "" : "coordinator-guide-unseen"}`}
+          >
+            <Icon name="info" size={15} />
+            Como funciona? Comece por aqui
+          </button>
+        </div>
+      )}
+      {showTour && <CoordinatorTour onClose={() => setShowTour(false)} />}
       {tab === "calendars" ? (
         <CalendarAdmin
           profile={profile}
@@ -511,7 +535,7 @@ export default function Admin() {
               </p>
             )}
             <div className="flex flex-wrap items-end gap-3 border-b border-line bg-surface px-5 py-4">
-              <label className="min-w-0 flex-1 sm:max-w-sm">
+              <label className="min-w-0 basis-full sm:basis-auto sm:flex-1 sm:max-w-sm">
                 Buscar registro
                 <span className="relative">
                   <span className="absolute left-3 top-3">
@@ -569,7 +593,8 @@ export default function Admin() {
               </div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[620px] text-left">
+                <table className="admin-records-table w-full min-w-[620px] text-left">
+                  <caption className="sr-only">{title}</caption>
                   <thead>
                     <tr className="border-b border-line bg-surface text-[10px] font-semibold uppercase tracking-wider text-muted">
                       <th scope="col" className="px-5 py-3">
@@ -644,7 +669,10 @@ export default function Admin() {
                             </div>
                           </div>
                         </td>
-                        <td className="max-w-xs px-5 py-4 text-xs leading-5 text-muted">
+                        <td
+                          data-label="Informações"
+                          className="max-w-xs px-5 py-4 text-xs leading-5 text-muted"
+                        >
                           {type === "lessons" ? (
                             <>
                               <strong className="font-medium tabular-nums text-ink">

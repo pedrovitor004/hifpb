@@ -204,6 +204,14 @@ test("seleção personalizada funciona no celular", async ({ page }) => {
     .getByRole("checkbox", { name: "PROG Programação", exact: true })
     .check();
   await expect(page.locator(".schedule-lesson")).toHaveCount(1);
+  await expect(
+    page.getByRole("region", { name: "Agenda por dia", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".mobile-lesson-card")).toHaveCount(1);
+  await expect(page.locator(".mobile-lesson-card")).toContainText(
+    "Programação",
+  );
+  await expect(page.locator(".schedule-grid")).toBeHidden();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -211,4 +219,51 @@ test("seleção personalizada funciona no celular", async ({ page }) => {
   ).toBe(true);
   await page.getByRole("button", { name: "Imprimir", exact: true }).click();
   expect(await page.evaluate(() => window.printCalls)).toBe(1);
+});
+
+test("agenda móvel mostra um dia por vez e permite consultar a semana e os detalhes", async ({
+  page,
+}, testInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const agenda = page.getByRole("region", {
+    name: "Agenda por dia",
+    exact: true,
+  });
+  await expect(agenda).toBeVisible();
+  await agenda
+    .getByRole("button", { name: "Segunda: 1 aula", exact: true })
+    .click();
+  await expect(agenda.locator(".mobile-lesson-card")).toHaveCount(1);
+  await expect(agenda.locator(".mobile-lesson-card")).toContainText(
+    "Matemática",
+  );
+  await agenda
+    .getByRole("button", { name: "Terça: 1 aula", exact: true })
+    .click();
+  await expect(agenda.locator(".mobile-lesson-card")).toContainText(
+    "Português",
+  );
+  await agenda.locator("summary").click();
+  await expect(
+    agenda.getByText("Professor exemplo", { exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath("agenda-mobile.png"),
+    fullPage: true,
+  });
+  await agenda
+    .getByRole("button", { name: "Sexta: 0 aulas", exact: true })
+    .click();
+  await expect(
+    agenda.getByText("Sem aulas neste dia.", { exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Semana", exact: true }).click();
+  const week = page.getByRole("region", {
+    name: "Agenda da semana",
+    exact: true,
+  });
+  await expect(week.locator(".mobile-lesson-card")).toHaveCount(3);
+  await page.emulateMedia({ media: "print" });
+  await expect(week).toBeHidden();
+  await expect(page.locator(".schedule-list")).toBeVisible();
 });

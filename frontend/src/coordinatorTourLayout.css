@@ -1,0 +1,321 @@
+/* Keep the demonstration and explanation together without enlarging other modals. */
+.coordinator-guide-modal {
+  max-width: 1040px;
+  max-height: calc(100dvh - 24px);
+}
+.coordinator-guide-modal .modal-layout {
+  max-height: calc(100dvh - 26px);
+}
+.coordinator-guide-modal .modal-header {
+  padding: 14px 22px;
+}
+.coordinator-guide-modal .modal-header > span {
+  width: 36px;
+  height: 36px;
+}
+.coordinator-guide-modal .modal-body {
+  padding: 14px 22px;
+}
+.coordinator-guide-modal .modal-footer {
+  padding: 10px 22px;
+}
+.coordinator-guide-modal .modal-footer button {
+  min-height: 36px;
+  font-size: 12px;
+}
+.coordinator-guide-modal .coordinator-tour {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 12px 22px;
+}
+.coordinator-guide-modal .guide-steps {
+  grid-column: 1/-1;
+  margin: 0;
+  padding: 0 0 10px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+.coordinator-guide-modal .guide-steps button {
+  padding: 6px 2px;
+  gap: 5px;
+}
+.coordinator-guide-modal .guide-step-symbol {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+}
+.coordinator-guide-modal .guide-step-symbol > svg {
+  width: 18px;
+  height: 18px;
+}
+.coordinator-guide-modal .guide-workspace {
+  min-height: 292px;
+  grid-template-columns: 110px minmax(0, 1fr);
+}
+.coordinator-guide-modal .tour-example-label {
+  padding: 9px 12px;
+  font-size: 8px;
+}
+.coordinator-guide-modal .guide-sidebar {
+  padding: 12px 6px;
+}
+.coordinator-guide-modal .guide-sidebar > div {
+  padding: 8px 5px;
+  font-size: 9px;
+}
+.coordinator-guide-modal .guide-content {
+  padding: 12px;
+}
+.coordinator-guide-modal .guide-toolbar {
+  font-size: 10px;
+}
+.coordinator-guide-modal .guide-create {
+  padding: 7px 8px;
+  font-size: 8px;
+}
+.coordinator-guide-modal .guide-form {
+  top: 49px;
+  left: 12px;
+  right: 12px;
+  padding: 10px;
+}
+.coordinator-guide-modal .guide-form-title {
+  margin-bottom: 8px;
+}
+.coordinator-guide-modal .guide-field {
+  margin-top: 6px;
+}
+.coordinator-guide-modal .guide-field > div {
+  min-height: 22px;
+  padding: 4px 6px;
+}
+.coordinator-guide-modal .guide-save {
+  margin-top: 8px;
+  padding: 7px 8px;
+}
+.coordinator-guide-modal .guide-success {
+  left: 10px;
+  right: 10px;
+  padding: 7px;
+  font-size: 9px;
+}
+.coordinator-guide-modal .guide-explanation {
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+  gap: 6px;
+}
+.coordinator-guide-modal .guide-character {
+  flex: 0 0 auto;
+  height: 90px;
+}
+.coordinator-guide-modal .guide-character .guide-mascot {
+  width: 100px;
+  height: 94px;
+}
+.coordinator-guide-modal .tour-caption {
+  min-height: 0;
+  margin: 0;
+}
+.coordinator-guide-modal .tour-caption > span {
+  font-size: 8px;
+  letter-spacing: 1px;
+}
+.coordinator-guide-modal .tour-caption h3 {
+  font-size: 17px;
+  line-height: 1.35;
+  margin-top: 7px;
+}
+.coordinator-guide-modal .tour-caption p {
+  font-size: 12px;
+  line-height: 1.75;
+  margin-top: 8px;
+}
+.coordinator-guide-modal .tour-controls {
+  grid-column: 1/-1;
+  margin-top: 0;
+}
+.coordinator-guide-modal .tour-pause {
+  padding: 6px 0;
+}
+@media (max-width: 700px) {
+  .coordinator-guide-modal {
+    max-width: 540px;
+  }
+  .coordinator-guide-modal .modal-header {
+    padding: 12px 16px;
+    gap: 8px;
+  }
+  .coordinator-guide-modal .modal-header h2 {
+    font-size: 16px;
+  }
+  .coordinator-guide-modal .modal-header p {
+    font-size: 10px;
+    line-height: 1.5;
+  }
+  .coordinator-guide-modal .modal-header > span {
+    width: 30px;
+    height: 30px;
+  }
+  .coordinator-guide-modal .modal-body {
+    padding: 10px 16px;
+  }
+  .coordinator-guide-modal .modal-footer {
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .coordinator-guide-modal .modal-footer button {
+    font-size: 11px;
+    min-height: 34px;
+    padding: 6px 10px;
+  }
+  .coordinator-guide-modal .coordinator-tour {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .coordinator-guide-modal .guide-steps {
+    gap: 2px;
+    padding-bottom: 8px;
+  }
+  .coordinator-guide-modal .guide-steps button {
+    gap: 5px;
+    padding: 4px 0;
+  }
+  .coordinator-guide-modal .guide-step-symbol {
+    width: 27px;
+    height: 27px;
+    border-radius: 8px;
+  }
+  .coordinator-guide-modal .guide-step-symbol > svg {
+    width: 15px;
+    height: 15px;
+  }
+  .coordinator-guide-modal .guide-step-symbol small {
+    width: 13px;
+    height: 13px;
+    font-size: 7px;
+    right: -3px;
+    bottom: -3px;
+  }
+  .coordinator-guide-modal .guide-steps strong {
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-steps em {
+    display: none;
+  }
+  .coordinator-guide-modal .tour-example-label {
+    padding: 7px 9px;
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-workspace {
+    min-height: 236px;
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+  .coordinator-guide-modal .guide-sidebar {
+    padding: 9px 4px;
+  }
+  .coordinator-guide-modal .guide-sidebar > strong {
+    font-size: 11px;
+    padding: 0 3px 7px;
+  }
+  .coordinator-guide-modal .guide-sidebar small {
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-sidebar > div {
+    padding: 6px 3px;
+    gap: 4px;
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-sidebar svg {
+    width: 11px;
+    height: 11px;
+  }
+  .coordinator-guide-modal .guide-content {
+    padding: 8px;
+  }
+  .coordinator-guide-modal .guide-toolbar {
+    gap: 4px;
+    font-size: 8px;
+    flex-wrap: nowrap;
+  }
+  .coordinator-guide-modal .guide-create {
+    padding: 6px;
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-form {
+    top: 44px;
+    left: 7px;
+    right: 7px;
+    padding: 8px;
+  }
+  .coordinator-guide-modal .guide-form-title {
+    font-size: 8px;
+    gap: 4px;
+    margin-bottom: 5px;
+  }
+  .coordinator-guide-modal .guide-form-title svg {
+    width: 12px;
+    height: 12px;
+  }
+  .coordinator-guide-modal .guide-field {
+    margin-top: 4px;
+  }
+  .coordinator-guide-modal .guide-field small {
+    font-size: 7px;
+    margin-bottom: 2px;
+  }
+  .coordinator-guide-modal .guide-field > div {
+    min-height: 18px;
+    padding: 3px 5px;
+  }
+  .coordinator-guide-modal .guide-field span {
+    font-size: 7px;
+  }
+  .coordinator-guide-modal .guide-save {
+    font-size: 7px;
+    padding: 5px 7px;
+    margin-top: 6px;
+  }
+  .coordinator-guide-modal .guide-success {
+    padding: 5px;
+    font-size: 7px;
+    left: 7px;
+    right: 7px;
+    bottom: 5px;
+  }
+  .coordinator-guide-modal .guide-success svg {
+    width: 12px;
+    height: 12px;
+  }
+  .coordinator-guide-modal .guide-explanation {
+    display: block;
+  }
+  .coordinator-guide-modal .guide-character {
+    float: left;
+    width: 65px;
+    height: 62px;
+    margin-right: 10px;
+  }
+  .coordinator-guide-modal .guide-character .guide-mascot {
+    width: 65px;
+    height: 64px;
+  }
+  .coordinator-guide-modal .tour-caption h3 {
+    font-size: 15px;
+    margin-top: 5px;
+  }
+  .coordinator-guide-modal .tour-caption > span {
+    font-size: 7px;
+    letter-spacing: 0.7px;
+  }
+  .coordinator-guide-modal .tour-caption p {
+    clear: both;
+    padding-top: 6px;
+    margin: 0;
+    font-size: 11px;
+    line-height: 1.65;
+  }
+  .coordinator-guide-modal .guide-progress-label,
+  .coordinator-guide-modal .tour-pause {
+    font-size: 9px;
+  }
+}

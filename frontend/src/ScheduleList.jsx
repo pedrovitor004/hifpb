@@ -13,7 +13,16 @@ export default function ScheduleList({
 }) {
   return (
     <div className="schedule-list overflow-hidden rounded-card border border-line bg-panel shadow-card">
-      <div className="overflow-x-auto">
+      <p className="schedule-list-hint no-print">
+        <Icon name="right" size={14} />
+        Deslize a tabela para ver todas as informações.
+      </p>
+      <div
+        className="schedule-list-scroll overflow-x-auto"
+        role="region"
+        aria-label="Lista de aulas com rolagem horizontal"
+        tabIndex={0}
+      >
         <table className="w-full min-w-[700px] text-left">
           <caption className="sr-only">
             Lista de aulas de segunda a sexta

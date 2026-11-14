@@ -1,0 +1,678 @@
+.guide-steps {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  padding: 8px 4px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--color-line);
+}
+.guide-steps button {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 2px 12px;
+  border-radius: 12px;
+  color: var(--color-muted);
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+.guide-steps button:hover {
+  background: var(--color-canvas);
+  color: var(--color-brand);
+}
+.guide-steps button:focus-visible {
+  outline: 2px solid var(--color-brand);
+  outline-offset: 2px;
+}
+.guide-steps .guide-step-symbol {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  border: 1px solid var(--color-line);
+  background: var(--color-canvas);
+}
+.guide-step-symbol small {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-panel);
+  border-radius: 50%;
+  background: var(--color-line);
+  color: var(--color-ink);
+  font-size: 8px;
+}
+.guide-steps strong {
+  font-size: 10px;
+  font-weight: 600;
+}
+.guide-steps em {
+  font-size: 8px;
+  font-style: normal;
+  line-height: 1;
+}
+.guide-steps button[aria-current] {
+  color: var(--color-brand);
+  background: var(--color-canvas);
+}
+.guide-steps button[aria-current] .guide-step-symbol {
+  background: var(--color-action);
+  border-color: var(--color-action);
+  color: white;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--color-brand) 10%, transparent);
+}
+.guide-steps button[aria-current] small {
+  background: var(--color-brand);
+  color: var(--color-panel);
+}
+.guide-stage {
+  overflow: hidden;
+  border: 1px solid var(--color-line);
+  border-radius: 14px;
+  background: var(--color-canvas);
+}
+.guide-workspace {
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  min-height: 350px;
+}
+.guide-sidebar {
+  padding: 16px 9px;
+  border-right: 1px solid var(--color-line);
+  background: var(--color-panel);
+}
+.guide-sidebar > strong {
+  display: block;
+  padding: 0 6px 12px;
+  font-size: 13px;
+  color: var(--color-brand);
+}
+.guide-sidebar small {
+  display: block;
+  font-size: 8px;
+  font-weight: 400;
+  color: var(--color-muted);
+  margin-top: 3px;
+}
+.guide-sidebar > div {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 7px;
+  border-radius: 7px;
+  font-size: 10px;
+  color: var(--color-muted);
+}
+.guide-sidebar .guide-menu-active {
+  background: var(--color-action);
+  color: white;
+  animation: guide-menu-select 1.2s both;
+}
+.guide-menu-click {
+  position: absolute;
+  right: 10px;
+  width: 15px;
+  height: 15px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  animation: guide-click 1.3s both;
+}
+.guide-content {
+  position: relative;
+  padding: 15px;
+  min-width: 0;
+}
+.guide-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+}
+.guide-create,
+.guide-save {
+  position: relative;
+  background: var(--color-action);
+  color: white;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 9px;
+}
+.guide-cursor {
+  position: absolute;
+  right: 12px;
+  top: 15px;
+  color: var(--color-ink);
+  filter: drop-shadow(0 1px 1px white);
+  animation: guide-cursor 2s both;
+}
+.guide-placeholder {
+  display: grid;
+  gap: 13px;
+  margin-top: 27px;
+}
+.guide-placeholder span {
+  height: 34px;
+  border: 1px solid var(--color-line);
+  border-radius: 7px;
+  background: var(--color-panel);
+}
+.guide-form {
+  position: absolute;
+  z-index: 1;
+  top: 57px;
+  left: 24px;
+  right: 24px;
+  padding: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: 12px;
+  background: var(--color-panel);
+  box-shadow: 0 12px 30px #00000015;
+  animation: guide-form-open 2.3s both;
+}
+.guide-form-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--color-brand);
+  font-size: 10px;
+  margin-bottom: 12px;
+}
+.guide-form-title > :last-child {
+  margin-left: auto;
+}
+.guide-field {
+  margin-top: 8px;
+}
+.guide-field small {
+  display: block;
+  color: var(--color-muted);
+  font-size: 8px;
+  margin-bottom: 4px;
+}
+.guide-field > div {
+  display: flex;
+  align-items: center;
+  min-height: 26px;
+  border: 1px solid var(--color-line);
+  border-radius: 5px;
+  padding: 5px 7px;
+  background: var(--color-canvas);
+}
+.guide-field span {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 9px;
+  animation: guide-type 0.55s var(--field-delay) both;
+}
+.guide-save {
+  width: fit-content;
+  margin-top: 12px;
+  margin-left: auto;
+  animation: guide-save-press 6.8s both;
+}
+.guide-save-cursor {
+  position: absolute;
+  top: 13px;
+  right: 10px;
+  color: var(--color-ink);
+  filter: drop-shadow(0 1px 1px white);
+  animation: guide-save-cursor 6.8s both;
+}
+.guide-success {
+  position: absolute;
+  bottom: 7px;
+  right: 15px;
+  left: 15px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px;
+  border: 1px solid var(--color-line);
+  border-radius: 8px;
+  background: var(--color-panel);
+  color: var(--color-brand);
+  font-size: 10px;
+  box-shadow: 0 4px 16px #00000010;
+  animation: guide-success 7.6s both;
+}
+.guide-explanation {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  margin-top: 22px;
+}
+.guide-character {
+  flex: 0 0 64px;
+  color: var(--color-brand);
+  padding-top: 12px;
+}
+.guide-character svg {
+  width: 64px;
+  height: 76px;
+}
+.guide-wave {
+  transform-origin: 76px 53px;
+  animation: guide-wave 2s ease-in-out infinite;
+}
+.guide-explanation .tour-caption {
+  margin-top: 0;
+  min-height: 130px;
+}
+.guide-explanation .tour-caption h3 {
+  font-size: 18px;
+}
+.guide-progress-label {
+  font-size: 10px;
+  color: var(--color-muted);
+}
+/* Manual navigation stops automatic advance; each illustrated scene keeps moving. */
+.guide-character {
+  flex-basis: 112px;
+  padding-top: 0;
+}
+.guide-character .guide-mascot {
+  width: 112px;
+  height: 112px;
+  overflow: visible;
+}
+.mascot-backdrop {
+  fill: currentColor;
+  opacity: 0.07;
+}
+.mascot-body {
+  animation: mascot-breathe 3.4s ease-in-out infinite;
+  transform-origin: 74px 133px;
+}
+.mascot-head {
+  animation: mascot-nod 4s ease-in-out infinite;
+  transform-origin: 74px 88px;
+}
+.mascot-eyes {
+  animation: mascot-blink 4.6s infinite;
+  transform-origin: 74px 64px;
+}
+.mascot-right-arm {
+  animation: mascot-point 2.5s ease-in-out infinite;
+  transform-origin: 99px 106px;
+}
+.mascot-prop {
+  animation:
+    mascot-prop-arrive 0.55s ease-out both,
+    mascot-float 3s 0.55s ease-in-out infinite;
+  transform-origin: 123px 80px;
+}
+.mascot-sparkles {
+  animation: mascot-sparkle 3s ease-in-out infinite;
+}
+.mascot-student-second {
+  animation: mascot-greet 2.4s ease-in-out infinite;
+}
+.mascot-page {
+  animation: mascot-page 3s ease-in-out infinite;
+  transform-origin: 122px 80px;
+}
+.mascot-cap {
+  animation: mascot-cap 3s ease-in-out infinite;
+}
+.mascot-door {
+  animation: mascot-page 3.5s ease-in-out infinite;
+  transform-origin: 110px 80px;
+}
+.mascot-clock-hand {
+  animation: mascot-clock 12s linear infinite;
+  transform-origin: 124px 79px;
+}
+.mascot-plane {
+  animation: mascot-flight 3.5s ease-in-out infinite;
+}
+.mascot-confetti {
+  animation: mascot-sparkle 1.8s ease-in-out infinite;
+}
+.guide-mascot-3 .mascot-right-arm {
+  animation: mascot-present 3s ease-in-out infinite;
+}
+.guide-mascot-6 .mascot-right-arm {
+  animation: mascot-celebrate 1.6s ease-in-out infinite;
+}
+@keyframes mascot-breathe {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+@keyframes mascot-nod {
+  0%,
+  70%,
+  100% {
+    transform: rotate(0);
+  }
+  35% {
+    transform: rotate(-4deg);
+  }
+}
+@keyframes mascot-blink {
+  0%,
+  43%,
+  47%,
+  100% {
+    transform: scaleY(1);
+  }
+  45% {
+    transform: scaleY(0.1);
+  }
+}
+@keyframes mascot-point {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+@keyframes mascot-prop-arrive {
+  from {
+    opacity: 0;
+    transform: translate(12px, 8px) scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: translate(0) scale(1);
+  }
+}
+@keyframes mascot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes mascot-sparkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes mascot-greet {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes mascot-page {
+  0%,
+  100% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.3);
+  }
+}
+@keyframes mascot-cap {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+@keyframes mascot-clock {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes mascot-flight {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  50% {
+    transform: translate(7px, -9px) rotate(-6deg);
+  }
+}
+@keyframes mascot-present {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+@keyframes mascot-celebrate {
+  0%,
+  100% {
+    transform: rotate(-12deg);
+  }
+  50% {
+    transform: rotate(14deg);
+  }
+}
+@media (max-width: 520px) {
+  .guide-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 0 0 12px;
+    margin-bottom: 14px;
+  }
+  .guide-steps button {
+    gap: 6px;
+    padding: 8px 2px;
+  }
+  .guide-steps .guide-step-symbol {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+  .guide-steps .guide-step-symbol > svg {
+    width: 17px;
+  }
+  .guide-steps strong {
+    font-size: 9px;
+  }
+  .guide-steps em {
+    font-size: 7px;
+  }
+  .guide-character {
+    flex-basis: 70px;
+  }
+  .guide-character .guide-mascot {
+    width: 70px;
+    height: 80px;
+  }
+}
+@keyframes guide-menu-select {
+  0%,
+  45% {
+    background: transparent;
+    color: var(--color-muted);
+  }
+  70%,
+  100% {
+    background: var(--color-action);
+    color: white;
+  }
+}
+@keyframes guide-click {
+  0%,
+  20% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2);
+  }
+}
+@keyframes guide-cursor {
+  0%,
+  35% {
+    opacity: 0;
+    transform: translate(-65px, 35px);
+  }
+  65%,
+  85% {
+    opacity: 1;
+    transform: translate(0, 0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes guide-form-open {
+  0%,
+  78% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes guide-type {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes guide-save-cursor {
+  0%,
+  70% {
+    opacity: 0;
+    transform: translate(-24px, 20px);
+  }
+  85%,
+  94% {
+    opacity: 1;
+    transform: translate(0);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes guide-save-press {
+  0%,
+  85%,
+  100% {
+    transform: scale(1);
+  }
+  91% {
+    transform: scale(0.95);
+  }
+}
+@keyframes guide-success {
+  0%,
+  88% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes guide-wave {
+  0%,
+  60%,
+  100% {
+    transform: rotate(0);
+  }
+  25%,
+  45% {
+    transform: rotate(14deg);
+  }
+  35% {
+    transform: rotate(-8deg);
+  }
+}
+@media (max-width: 520px) {
+  .guide-workspace {
+    grid-template-columns: 94px minmax(0, 1fr);
+    min-height: 360px;
+  }
+  .guide-sidebar {
+    padding: 14px 4px;
+  }
+  .guide-sidebar > div {
+    font-size: 8px;
+    gap: 4px;
+    padding: 10px 4px;
+  }
+  .guide-content {
+    padding: 12px 8px;
+  }
+  .guide-toolbar {
+    flex-wrap: wrap;
+    font-size: 10px;
+  }
+  .guide-form {
+    left: 8px;
+    right: 8px;
+    top: 76px;
+    padding: 10px;
+  }
+  .guide-create {
+    font-size: 8px;
+  }
+  .guide-character {
+    flex-basis: 40px;
+  }
+  .guide-character svg {
+    width: 40px;
+    height: 55px;
+  }
+  .guide-explanation {
+    gap: 10px;
+  }
+  .guide-explanation .tour-caption h3 {
+    font-size: 16px;
+  }
+  .guide-success {
+    font-size: 8px;
+    left: 8px;
+    right: 8px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coordinator-tour *,
+  .coordinator-tour *::after {
+    animation: none !important;
+  }
+  .guide-cursor,
+  .guide-save-cursor,
+  .guide-menu-click {
+    display: none;
+  }
+}

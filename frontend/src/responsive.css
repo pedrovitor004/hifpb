@@ -1,0 +1,317 @@
+/* Screen-only rules preserve the layout of printed schedules. */
+#main :where(h1, h2, h3, p, dd, strong) {
+  overflow-wrap: anywhere;
+}
+#main :where(.grid) > * {
+  min-width: 0;
+}
+.modal-body,
+.hifpb-sidebar {
+  overscroll-behavior-y: contain;
+}
+.modal-body :where(fieldset, label, div) {
+  min-width: 0;
+}
+.modal-header h2,
+.modal-body :where(p, strong, a) {
+  overflow-wrap: anywhere;
+}
+.schedule-list-scroll {
+  overscroll-behavior-x: contain;
+}
+.mobile-schedule,
+.schedule-mobile-label {
+  display: none;
+}
+@media screen and (max-width: 767px) {
+  .mobile-schedule,
+  .schedule-mobile-label {
+    display: block;
+  }
+  .schedule-print-root .schedule-grid,
+  .schedule-desktop-list,
+  .schedule-desktop-label {
+    display: none;
+  }
+  .mobile-weekdays {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 18px;
+  }
+  .mobile-weekdays button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 10px 3px;
+    min-height: 64px;
+    border: 1px solid var(--color-line);
+    background: var(--color-panel);
+    border-radius: 12px;
+    color: var(--color-muted);
+  }
+  .mobile-weekdays strong {
+    font-size: 12px;
+  }
+  .mobile-weekdays button > span {
+    font-size: 9px;
+  }
+  .mobile-weekdays button[aria-pressed="true"] {
+    border-color: var(--color-action);
+    background: var(--color-action);
+    color: white;
+    box-shadow: 0 4px 10px #064e3b14;
+  }
+  .mobile-agenda-day + .mobile-agenda-day {
+    margin-top: 24px;
+  }
+  .mobile-agenda-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 0 2px 12px;
+  }
+  .mobile-agenda-heading h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 15px;
+  }
+  .mobile-agenda-heading small,
+  .mobile-agenda-heading > span {
+    color: var(--color-muted);
+    font-size: 10px;
+    font-weight: 400;
+  }
+  .mobile-agenda-lessons {
+    display: grid;
+    gap: 10px;
+  }
+  .mobile-lesson-card {
+    border: 1px solid var(--color-line);
+    border-left: 4px solid var(--lesson-accent);
+    border-radius: 12px;
+    background: var(--color-panel);
+    overflow: hidden;
+  }
+  .mobile-lesson-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 12px;
+    min-height: 82px;
+  }
+  .mobile-lesson-main > svg {
+    flex-shrink: 0;
+    color: var(--color-muted);
+  }
+  .mobile-lesson-time {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding-right: 12px;
+    border-right: 1px solid var(--color-line);
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobile-lesson-time strong {
+    font-size: 16px;
+    letter-spacing: -0.5px;
+  }
+  .mobile-lesson-time span {
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+  .mobile-lesson-subject {
+    min-width: 0;
+    flex: 1;
+  }
+  .mobile-lesson-subject small {
+    font-size: 9px;
+    color: var(--color-muted);
+  }
+  .mobile-lesson-subject h3 {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-top: 3px;
+  }
+  .mobile-lesson-more {
+    border-top: 1px solid var(--color-line);
+  }
+  .mobile-lesson-more summary {
+    display: flex;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--color-muted);
+    cursor: pointer;
+    list-style: none;
+  }
+  .mobile-lesson-more summary::-webkit-details-marker {
+    display: none;
+  }
+  .mobile-lesson-more[open] summary svg {
+    transform: rotate(180deg);
+  }
+  .mobile-lesson-more p {
+    display: flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding: 0 12px 12px;
+    font-size: 11px;
+    line-height: 1.6;
+  }
+  .mobile-lesson-more p > svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .mobile-lesson-card .lesson-notice-trigger {
+    width: calc(100% - 24px);
+    margin: 0 12px 12px;
+  }
+  .mobile-agenda-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 30px 16px;
+    border: 1px dashed var(--color-line);
+    border-radius: 12px;
+    background: var(--color-panel);
+    color: var(--color-muted);
+  }
+  .mobile-agenda-empty p {
+    font-size: 13px;
+  }
+  .mobile-agenda-empty small {
+    font-size: 11px;
+  }
+}
+@media screen and (max-width: 767px) {
+  /* 16px controls prevent focus zoom in mobile Safari. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+  input:not([type="checkbox"]):not([type="radio"]),
+  select {
+    min-height: 44px;
+  }
+  button:not(.guide-steps button):not(.tour-step-dots button) {
+    min-height: 44px;
+  }
+  .app-topbar button,
+  .modal-header > button {
+    min-width: 44px;
+  }
+  .hifpb-sidebar {
+    width: min(280px, calc(100vw - 48px));
+    padding-top: max(16px, env(safe-area-inset-top));
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+  .hifpb-sidebar nav :where(a, button),
+  .sidebar-signout {
+    min-height: 44px;
+  }
+  .app-topbar {
+    padding-top: env(safe-area-inset-top);
+  }
+  .modal-layout {
+    max-height: calc(100dvh - 28px);
+  }
+  .modal-footer {
+    padding-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+  .modal-footer > button {
+    flex-shrink: 1;
+    white-space: normal;
+  }
+  .schedule-list-hint {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px;
+    border-bottom: 1px solid var(--color-line);
+    font-size: 11px;
+    color: var(--color-muted);
+  }
+}
+@media screen and (min-width: 768px) {
+  .schedule-list-hint {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 1023px) {
+  .admin-records-table {
+    min-width: 0;
+  }
+  .admin-records-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .admin-records-table tbody {
+    display: grid;
+    gap: 12px;
+    padding: 12px;
+  }
+  .admin-records-table tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border: 1px solid var(--color-line);
+    border-radius: 12px;
+    background: var(--color-panel);
+  }
+  .admin-records-table tbody tr:last-child {
+    border: 1px solid var(--color-line);
+  }
+  .admin-records-table td {
+    padding: 10px 12px;
+    min-width: 0;
+  }
+  .admin-records-table td:nth-child(-n + 2) {
+    grid-column: 1/-1;
+    max-width: none;
+  }
+  .admin-records-table td:first-child {
+    padding-bottom: 4px;
+  }
+  .admin-records-table td:first-child > div > div {
+    min-width: 0;
+  }
+  .admin-records-table td:nth-child(2)::before {
+    content: attr(data-label);
+    display: block;
+    margin-bottom: 4px;
+    color: var(--color-muted);
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .admin-records-table td:nth-child(3) {
+    align-self: center;
+  }
+  .admin-records-table td:last-child {
+    padding-left: 0;
+  }
+  .admin-records-table td:last-child button {
+    width: 44px;
+    height: 44px;
+  }
+  .admin-records-table :where(strong, p) {
+    overflow-wrap: anywhere;
+  }
+}

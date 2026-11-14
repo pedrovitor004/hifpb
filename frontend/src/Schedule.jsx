@@ -11,6 +11,7 @@ import {
   RoomIcon,
 } from "./components";
 import ScheduleList from "./ScheduleList";
+import MobileSchedule from "./MobileSchedule";
 import NoticeDetails, { LessonNoticeIndicator } from "./NoticeDetails";
 import { currentWeekDates, lessonNotice } from "./lessonNotices";
 const periodBorders = [
@@ -308,7 +309,10 @@ export default function Schedule() {
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs transition ${list === value ? "bg-panel font-semibold text-brand shadow-sm ring-1 ring-line" : "text-muted hover:text-brand"}`}
                 >
                   <Icon name={icon} />
-                  {label}
+                  <span className="schedule-desktop-label">{label}</span>
+                  <span className="schedule-mobile-label">
+                    {value ? "Semana" : "Por dia"}
+                  </span>
                 </button>
               ))}
             </div>
@@ -342,132 +346,157 @@ export default function Schedule() {
             : "Não há aulas vigentes para a turma selecionada."}
         </Empty>
       ) : list ? (
-        <ScheduleList
-          lessons={lessons}
-          data={data}
-          params={params}
-          dates={dates}
-          onOpenNotice={setSelectedNotice}
-        />
-      ) : (
-        <div className="schedule-grid overflow-hidden rounded-card border border-line bg-panel shadow-card">
-          <div
-            className="overflow-x-auto"
-            tabIndex={0}
-            role="region"
-            aria-label="Grade de segunda a sexta com rolagem horizontal"
-          >
-            <table className="w-full min-w-[880px] table-fixed border-collapse">
-              <thead>
-                <tr>
-                  <th className="w-20 border-b border-r border-line bg-surface p-3 text-xs">
-                    Horário
-                  </th>
-                  {days.map((day, index) => (
-                    <th
-                      key={day}
-                      className="border-b border-r border-line px-2 py-4 text-xs"
-                    >
-                      {day}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {times.map((time) => (
-                  <React.Fragment key={time}>
-                    {time === "20:30" && (
-                      <tr>
-                        <td colSpan={6} className="bg-action py-1.5">
-                          <span className="flex items-center justify-center gap-2 text-[10px] font-medium text-white">
-                            <Icon name="interval" size={14} />
-                            20:10–20:30 · Intervalo
-                          </span>
-                        </td>
-                      </tr>
-                    )}
-                    <tr>
-                      <th className="border-b border-r border-line bg-surface px-3 py-4 align-top text-xs tabular-nums">
-                        {time}
-                      </th>
-                      {days.map((day, index) => (
-                        <td
-                          key={day}
-                          className="border-b border-r border-line p-1.5 align-top"
-                        >
-                          <div className="space-y-2">
-                            {lessons
-                              .filter(
-                                (lesson) =>
-                                  lesson.weekday === index + 1 &&
-                                  lesson.startTime === time,
-                              )
-                              .map((lesson) => {
-                                const { subject, professor, room } = resolve(
-                                  data,
-                                  lesson,
-                                  courseId,
-                                );
-                                const notice = lessonNotice(
-                                  data.notices,
-                                  lesson.id,
-                                  dates[index],
-                                );
-                                const details = new URLSearchParams(params);
-                                details.set("date", dates[index]);
-                                return (
-                                  <div
-                                    key={lesson.id}
-                                    style={{
-                                      "--lesson-color":
-                                        subject?.color || "#dcfce7",
-                                    }}
-                                    className="schedule-lesson group flex min-h-[190px] flex-col rounded-control border border-black/5 bg-[var(--lesson-color)] p-3.5 text-[#16382c] transition hover:shadow-md dark:bg-[color-mix(in_srgb,var(--lesson-color)_20%,var(--color-panel))] dark:text-ink"
-                                  >
-                                    <Link
-                                      to={`/aulas/${lesson.id}?${details}`}
-                                      className="flex flex-1 flex-col"
-                                    >
-                                      <strong className="text-sm">
-                                        {subject?.code}
-                                      </strong>
-                                      <span className="mt-1 text-xs tabular-nums">
-                                        {lesson.startTime}–{lesson.endTime}
-                                      </span>
-                                      <span className="mt-2 text-xs">
-                                        {professor.name}
-                                      </span>
-                                      <span className="mt-2 flex items-center gap-1.5 text-xs">
-                                        <RoomIcon room={room} size={15} />
-                                        {room?.name || "Sala não informada"}
-                                      </span>
-                                      <span className="no-print mt-auto flex items-center gap-2 pt-3 text-[10px] font-semibold">
-                                        Ver detalhes
-                                        <Icon name="open" size={14} />
-                                      </span>
-                                    </Link>
-                                    <LessonNoticeIndicator
-                                      notice={notice}
-                                      subject={
-                                        subject?.code ||
-                                        subject?.name ||
-                                        "disciplina"
-                                      }
-                                      onOpen={setSelectedNotice}
-                                    />
-                                  </div>
-                                );
-                              })}
-                          </div>
-                        </td>
-                      ))}
-                    </tr>
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
+        <>
+          <MobileSchedule
+            key={`${courseId}:${classId}:${customized}`}
+            lessons={lessons}
+            data={data}
+            courseId={courseId}
+            params={params}
+            dates={dates}
+            week
+            onOpenNotice={setSelectedNotice}
+          />
+          <div className="schedule-desktop-list">
+            <ScheduleList
+              lessons={lessons}
+              data={data}
+              params={params}
+              dates={dates}
+              onOpenNotice={setSelectedNotice}
+            />
           </div>
-        </div>
+        </>
+      ) : (
+        <>
+          <MobileSchedule
+            key={`${courseId}:${classId}:${customized}`}
+            lessons={lessons}
+            data={data}
+            courseId={courseId}
+            params={params}
+            dates={dates}
+            onOpenNotice={setSelectedNotice}
+          />
+          <div className="schedule-grid overflow-hidden rounded-card border border-line bg-panel shadow-card">
+            <div
+              className="overflow-x-auto"
+              tabIndex={0}
+              role="region"
+              aria-label="Grade de segunda a sexta com rolagem horizontal"
+            >
+              <table className="w-full min-w-[880px] table-fixed border-collapse">
+                <thead>
+                  <tr>
+                    <th className="w-20 border-b border-r border-line bg-surface p-3 text-xs">
+                      Horário
+                    </th>
+                    {days.map((day, index) => (
+                      <th
+                        key={day}
+                        className="border-b border-r border-line px-2 py-4 text-xs"
+                      >
+                        {day}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {times.map((time) => (
+                    <React.Fragment key={time}>
+                      {time === "20:30" && (
+                        <tr>
+                          <td colSpan={6} className="bg-action py-1.5">
+                            <span className="flex items-center justify-center gap-2 text-[10px] font-medium text-white">
+                              <Icon name="interval" size={14} />
+                              20:10–20:30 · Intervalo
+                            </span>
+                          </td>
+                        </tr>
+                      )}
+                      <tr>
+                        <th className="border-b border-r border-line bg-surface px-3 py-4 align-top text-xs tabular-nums">
+                          {time}
+                        </th>
+                        {days.map((day, index) => (
+                          <td
+                            key={day}
+                            className="border-b border-r border-line p-1.5 align-top"
+                          >
+                            <div className="space-y-2">
+                              {lessons
+                                .filter(
+                                  (lesson) =>
+                                    lesson.weekday === index + 1 &&
+                                    lesson.startTime === time,
+                                )
+                                .map((lesson) => {
+                                  const { subject, professor, room } = resolve(
+                                    data,
+                                    lesson,
+                                    courseId,
+                                  );
+                                  const notice = lessonNotice(
+                                    data.notices,
+                                    lesson.id,
+                                    dates[index],
+                                  );
+                                  const details = new URLSearchParams(params);
+                                  details.set("date", dates[index]);
+                                  return (
+                                    <div
+                                      key={lesson.id}
+                                      style={{
+                                        "--lesson-color":
+                                          subject?.color || "#dcfce7",
+                                      }}
+                                      className="schedule-lesson group flex min-h-[190px] flex-col rounded-control border border-black/5 bg-[var(--lesson-color)] p-3.5 text-[#16382c] transition hover:shadow-md dark:bg-[color-mix(in_srgb,var(--lesson-color)_20%,var(--color-panel))] dark:text-ink"
+                                    >
+                                      <Link
+                                        to={`/aulas/${lesson.id}?${details}`}
+                                        className="flex flex-1 flex-col"
+                                      >
+                                        <strong className="text-sm">
+                                          {subject?.code}
+                                        </strong>
+                                        <span className="mt-1 text-xs tabular-nums">
+                                          {lesson.startTime}–{lesson.endTime}
+                                        </span>
+                                        <span className="mt-2 text-xs">
+                                          {professor.name}
+                                        </span>
+                                        <span className="mt-2 flex items-center gap-1.5 text-xs">
+                                          <RoomIcon room={room} size={15} />
+                                          {room?.name || "Sala não informada"}
+                                        </span>
+                                        <span className="no-print mt-auto flex items-center gap-2 pt-3 text-[10px] font-semibold">
+                                          Ver detalhes
+                                          <Icon name="open" size={14} />
+                                        </span>
+                                      </Link>
+                                      <LessonNoticeIndicator
+                                        notice={notice}
+                                        subject={
+                                          subject?.code ||
+                                          subject?.name ||
+                                          "disciplina"
+                                        }
+                                        onOpen={setSelectedNotice}
+                                      />
+                                    </div>
+                                  );
+                                })}
+                            </div>
+                          </td>
+                        ))}
+                      </tr>
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
       <p className="no-print mt-4 text-xs leading-5 text-muted">
         Para baixar, clique em “Imprimir” e escolha “Salvar como PDF” no destino

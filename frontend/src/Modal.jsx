@@ -9,6 +9,7 @@ export default function Modal({
   children,
   footer,
   wide = false,
+  className = "",
 }) {
   const dialog = useRef(null),
     close = useRef(onClose);
@@ -65,10 +66,10 @@ export default function Modal({
         aria-modal="true"
         aria-labelledby="modal-title"
         aria-describedby={description ? "modal-description" : undefined}
-        className={`max-h-[90dvh] w-full overflow-hidden rounded-[20px] border border-line bg-panel text-ink shadow-float ${wide ? "max-w-[780px]" : "max-w-[540px]"}`}
+        className={`max-h-[90dvh] w-full overflow-hidden rounded-[20px] border border-line bg-panel text-ink shadow-float ${wide ? "max-w-[780px]" : "max-w-[540px]"} ${className}`}
       >
-        <div className="flex max-h-[90dvh] flex-col">
-          <div className="flex shrink-0 items-start gap-3 border-b border-line px-5 py-5 sm:px-7">
+        <div className="modal-layout flex max-h-[90dvh] flex-col">
+          <div className="modal-header flex shrink-0 items-start gap-3 border-b border-line px-5 py-5 sm:px-7">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-line bg-canvas">
               <Icon name={icon} />
             </span>
@@ -94,11 +95,11 @@ export default function Modal({
               <Icon name="close" />
             </button>
           </div>
-          <div className="min-h-0 overflow-y-auto px-5 py-6 sm:px-7">
+          <div className="modal-body min-h-0 overflow-y-auto px-5 py-6 sm:px-7">
             {children}
           </div>
           {footer && (
-            <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-line bg-surface px-5 py-4 sm:px-7">
+            <div className="modal-footer flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-line bg-surface px-5 py-4 sm:px-7">
               {footer}
             </div>
           )}
