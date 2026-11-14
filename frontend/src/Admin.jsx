@@ -45,7 +45,8 @@ const catalogs = {
 const fields = {
   professors: [
     ["name", "Nome"],
-    ["roomId", "Sala de referência", "rooms"],
+    ["qualification", "Titulação", "qualification"],
+    ["lattesUrl", "Currículo Lattes", "url"],
     ["description", "Descrição", "textarea"],
   ],
   subjects: [
@@ -239,7 +240,6 @@ export default function Admin() {
         body.lessonId ||= null;
         body.occurrenceDate ||= null;
       }
-      if (type === "professors" && !body.roomId) delete body.roomId;
       if (type === "lessons") {
         body.roomId ||= null;
         body.professorId ||= null;
@@ -767,6 +767,14 @@ export default function Admin() {
                         </fieldset>
                       );
                     let options = data[kind];
+                    if (kind === "qualification")
+                      options = [
+                        "Graduação",
+                        "Especialização",
+                        "Mestrado",
+                        "Doutorado",
+                        "Pós-doutorado",
+                      ].map((name) => ({ id: name, name }));
                     if (kind === "level")
                       options = [
                         { id: "superior", name: "Superior" },
@@ -803,9 +811,23 @@ export default function Admin() {
                           label={label}
                           value={value}
                           onChange={change}
-                          required={!["roomId", "professorId"].includes(key)}
+                          required={
+                            ![
+                              "roomId",
+                              "professorId",
+                              "qualification",
+                            ].includes(key)
+                          }
                         >
-                          <option value="">Selecione</option>
+                          <option value="">
+                            {[
+                              "roomId",
+                              "professorId",
+                              "qualification",
+                            ].includes(key)
+                              ? "Não informado (opcional)"
+                              : "Selecione"}
+                          </option>
                           {options.map((o) => (
                             <option key={o.id} value={o.id}>
                               {o.name || o.code}
@@ -845,11 +867,26 @@ export default function Admin() {
                           <input
                             id={`field-${key}`}
                             type={kind || "text"}
-                            required={key !== "validTo"}
+                            required={!["validTo", "lattesUrl"].includes(key)}
                             value={value}
                             onChange={change}
                             maxLength={kind ? undefined : 200}
                             min={key === "endTime" ? form.startTime : undefined}
+                            placeholder={
+                              key === "lattesUrl"
+                                ? "https://lattes.cnpq.br/…"
+                                : undefined
+                            }
+                            pattern={
+                              key === "lattesUrl"
+                                ? "https?://lattes\\.cnpq\\.br/[0-9]{16}/?"
+                                : undefined
+                            }
+                            title={
+                              key === "lattesUrl"
+                                ? "Informe o endereço do currículo Lattes com os 16 dígitos de identificação."
+                                : undefined
+                            }
                             className={kind === "color" ? "h-11 p-1" : ""}
                           />
                         )}

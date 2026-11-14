@@ -59,7 +59,8 @@ export function RoomDirectory() {
   );
   const rooms = data.rooms.filter(
     (r) =>
-      !cleared && (!period || related.some((l) => l.roomId === r.id)) &&
+      !cleared &&
+      (!period || related.some((l) => l.roomId === r.id)) &&
       `${r.name} ${r.block}`.toLowerCase().includes(search.toLowerCase()) &&
       (!block || r.block === block) &&
       (!type || r.type === type),
@@ -103,12 +104,16 @@ export function RoomDirectory() {
           value={period}
           onChange={(e) => setParams({ period: e.target.value })}
         >
-          <option value="">{cleared ? "Selecione o período" : "Todos os períodos"}</option>
-          {[...new Set(data.classes.map(c=>c.period))].sort((a,b)=>a-b).map((p) => (
-            <option value={p} key={p}>
-              {p}º período
-            </option>
-          ))}
+          <option value="">
+            {cleared ? "Selecione o período" : "Todos os períodos"}
+          </option>
+          {[...new Set(data.classes.map((c) => c.period))]
+            .sort((a, b) => a - b)
+            .map((p) => (
+              <option value={p} key={p}>
+                {p}º período
+              </option>
+            ))}
         </Select>
         <Select
           label="Tipo"
@@ -140,12 +145,22 @@ export function RoomDirectory() {
               {rooms.length} locais
             </span>
           </div>
-          {!data.rooms.length && data.user && <Link to="/admin?tab=rooms" className="mb-5 inline-flex items-center gap-2 rounded-control bg-action px-4 py-3 text-xs font-semibold text-white"><Icon name="plus"/>Cadastrar salas</Link>}
+          {!data.rooms.length && data.user && (
+            <Link
+              to="/admin?tab=rooms"
+              className="mb-5 inline-flex items-center gap-2 rounded-control bg-action px-4 py-3 text-xs font-semibold text-white"
+            >
+              <Icon name="plus" />
+              Cadastrar salas
+            </Link>
+          )}
           {!rooms.length ? (
             <Empty>
               {cleared
                 ? "Selecione um período para consultar as salas."
-                : !data.rooms.length ? "As salas ainda não foram cadastradas. Os documentos de horários recebidos não informam os ambientes das aulas." : "Nenhuma sala corresponde aos filtros. Experimente outra busca."}
+                : !data.rooms.length
+                  ? "As salas ainda não foram cadastradas. Os documentos de horários recebidos não informam os ambientes das aulas."
+                  : "Nenhuma sala corresponde aos filtros. Experimente outra busca."}
             </Empty>
           ) : (
             <div className="space-y-2">
@@ -247,29 +262,259 @@ export function RoomDirectory() {
     </>
   );
 }
-export function ProfessorDirectory(){
- const data=useData(),[params,setParams]=useSearchParams();
- const cleared=params.get('cleared')==='1',period=params.get('period')||'',selectedId=params.get('professorId')||'gildo';
- const [search,setSearch]=useState(''),[subject,setSubject]=useState('');
- const hasTeacher=(l,id)=>(l.professorIds||[l.professorId]).includes(id);
- const allLessons=cleared?[]:data.lessons.filter(l=>!period||data.classes.some(c=>(l.classIds||[l.classId]).includes(c.id)&&c.period===Number(period)));
- const lessons=allLessons.filter(l=>!subject||(l.subjectIds||[l.subjectId]).includes(subject));
- const professors=data.professors.filter(p=>lessons.some(l=>hasTeacher(l,p.id))&&[p.name,...lessons.filter(l=>hasTeacher(l,p.id)).map(l=>resolve(data,l).subject?.code)].join(' ').toLowerCase().includes(search.toLowerCase()));
- const selected=professors.find(p=>p.id===selectedId)||professors[0],selectedLessons=lessons.filter(l=>hasTeacher(l,selected?.id)).sort((a,b)=>a.weekday-b.weekday||a.startTime.localeCompare(b.startTime));
- return <>
- <Title title="Professores" subtitle="Consulte os docentes e as disciplinas do período selecionado."/>
- <div className="mb-5 grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
- <SearchField label="Buscar professor ou disciplina" value={search} onChange={e=>{setSearch(e.target.value);if(cleared)setParams({period:'4'});}} placeholder="Nome ou disciplina"/>
- <Select label="Período" value={period} onChange={e=>{setParams({period:e.target.value});setSubject('');}}><option value="">{cleared?'Selecione o período':'Todos os períodos'}</option>{[...new Set(data.classes.map(c=>c.period))].sort((a,b)=>a-b).map(p=><option key={p} value={p}>{p}º período</option>)}</Select>
- <Select label="Disciplina" value={subject} onChange={e=>setSubject(e.target.value)}><option value="">Todas as disciplinas</option>{data.subjects.filter(s=>allLessons.some(l=>(l.subjectIds||[l.subjectId]).includes(s.id))).map(s=><option key={s.id} value={s.id}>{s.code}</option>)}</Select>
- <Reset onClick={()=>{setParams({cleared:'1'});setSearch('');setSubject('');}}/>
- </div>
- <div className="grid items-start gap-5 lg:grid-cols-[1.7fr_1fr]">
- <Card className="!p-0 overflow-hidden"><div className="flex flex-wrap items-center justify-between gap-2 px-5 pt-5"><h2 className="flex items-center gap-2 text-base"><CourseIcon course={data.selectedCourseId}/>Docentes da turma</h2><span className="rounded-full border border-line bg-canvas px-2 py-0.5 text-[10px] text-muted">{period?`${data.courses.find(c=>c.id===data.selectedCourseId)?.code || ''} ${period}`:'Todos os períodos'}</span></div><div className="mt-5 flex justify-between px-5 pb-3 text-[10px] font-medium uppercase tracking-wider text-muted"><span>Professor / disciplina</span><span>Aulas na semana</span></div>
- {professors.length?professors.map(p=><button key={p.id} aria-pressed={selected?.id===p.id} onClick={()=>setParams({period,professorId:p.id})} className={`flex w-full items-center gap-3 border-y border-transparent border-b-line px-5 py-4 text-left transition ${selected?.id===p.id?'border-l-[3px] border-l-emerald-500 bg-emerald-50 dark:bg-emerald-950/40':'hover:bg-canvas'}`}><span className={`flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ${selected?.id===p.id?'bg-action text-white':'bg-canvas text-brand'}`}>{p.name[0]}</span><span className="min-w-0 flex-1"><strong className="text-[13px]">{p.name}</strong><small className="mt-1 block truncate text-[11px] text-muted">{[...new Set(lessons.filter(l=>hasTeacher(l,p.id)).map(l=>resolve(data,l).subject?.code))].join(' • ')}</small></span><span className="text-right text-[11px] font-medium text-muted">{[...new Set(lessons.filter(l=>hasTeacher(l,p.id)).map(l=>days[l.weekday-1].slice(0,3)))].join(' • ')}</span><Icon name="right" size={16}/></button>):<Empty>Nenhum professor corresponde aos filtros selecionados.</Empty>}
- <p className="border-t border-line bg-surface px-5 py-3 text-[10px] text-muted">{data.courses.find(c=>c.id===data.selectedCourseId)?.name} {period?`• ${period}º período`:''}</p>
- </Card>
- {selected&&<Card className="!p-5 lg:sticky lg:top-5"><div className="mb-4 flex items-center gap-4 border-b border-line pb-4"><span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-action text-sm font-bold text-white">{selected.name[0]}</span><div><h2 className="text-base">{selected.name}</h2><p className="mt-1 text-[11px] text-muted">Docente • {data.courses.find(c=>c.id===data.selectedCourseId)?.code} {period}</p></div></div><h3 className="text-[13px]">Agenda do período consultado</h3><p className="mb-4 mt-1 text-[11px] text-muted">Aulas recorrentes</p><div className="space-y-3">{selectedLessons.map(l=>{const {subject,room,group}=resolve(data,l);return <Link key={l.id} to={`/aulas/${l.id}?courseId=${data.selectedCourseId}&period=${group?.period}`} className="group block rounded-xl border border-line bg-canvas p-4 transition hover:border-muted hover:shadow-card"><p className="text-[11px] text-muted">{days[l.weekday-1]} • {subject?.code}</p><strong className="my-2 block text-xl tabular-nums text-brand">{l.startTime}–{l.endTime}</strong><span className="flex items-center gap-1.5 text-[11px] font-medium text-brand"><RoomIcon room={room} size={16}/>{room?.name||'Sala não informada'}<span className="ml-auto transition-transform group-hover:translate-x-0.5"><Icon name="open" size={14}/></span></span></Link>;})}</div></Card>}
- </div>
- </>;
+export function ProfessorDirectory() {
+  const data = useData(),
+    [params, setParams] = useSearchParams();
+  const cleared = params.get("cleared") === "1",
+    period = params.get("period") || "",
+    selectedId = params.get("professorId") || "gildo";
+  const [search, setSearch] = useState(""),
+    [subject, setSubject] = useState("");
+  const hasTeacher = (l, id) =>
+    (l.professorIds || [l.professorId]).includes(id);
+  const allLessons = cleared
+    ? []
+    : data.lessons.filter(
+        (l) =>
+          !period ||
+          data.classes.some(
+            (c) =>
+              (l.classIds || [l.classId]).includes(c.id) &&
+              c.period === Number(period),
+          ),
+      );
+  const lessons = allLessons.filter(
+    (l) => !subject || (l.subjectIds || [l.subjectId]).includes(subject),
+  );
+  const professors = data.professors.filter(
+    (p) =>
+      lessons.some((l) => hasTeacher(l, p.id)) &&
+      [
+        p.name,
+        ...lessons
+          .filter((l) => hasTeacher(l, p.id))
+          .map((l) => resolve(data, l).subject?.code),
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(search.toLowerCase()),
+  );
+  const selected = professors.find((p) => p.id === selectedId) || professors[0],
+    selectedLessons = lessons
+      .filter((l) => hasTeacher(l, selected?.id))
+      .sort(
+        (a, b) =>
+          a.weekday - b.weekday || a.startTime.localeCompare(b.startTime),
+      );
+  return (
+    <>
+      <Title
+        title="Professores"
+        subtitle="Consulte os docentes e as disciplinas do período selecionado."
+      />
+      <div className="mb-5 grid items-end gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto]">
+        <SearchField
+          label="Buscar professor ou disciplina"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            if (cleared) setParams({ period: "4" });
+          }}
+          placeholder="Nome ou disciplina"
+        />
+        <Select
+          label="Período"
+          value={period}
+          onChange={(e) => {
+            setParams({ period: e.target.value });
+            setSubject("");
+          }}
+        >
+          <option value="">
+            {cleared ? "Selecione o período" : "Todos os períodos"}
+          </option>
+          {[...new Set(data.classes.map((c) => c.period))]
+            .sort((a, b) => a - b)
+            .map((p) => (
+              <option key={p} value={p}>
+                {p}º período
+              </option>
+            ))}
+        </Select>
+        <Select
+          label="Disciplina"
+          value={subject}
+          onChange={(e) => setSubject(e.target.value)}
+        >
+          <option value="">Todas as disciplinas</option>
+          {data.subjects
+            .filter((s) =>
+              allLessons.some((l) =>
+                (l.subjectIds || [l.subjectId]).includes(s.id),
+              ),
+            )
+            .map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.code}
+              </option>
+            ))}
+        </Select>
+        <Reset
+          onClick={() => {
+            setParams({ cleared: "1" });
+            setSearch("");
+            setSubject("");
+          }}
+        />
+      </div>
+      <div className="grid items-start gap-5 lg:grid-cols-[1.7fr_1fr]">
+        <Card className="!p-0 overflow-hidden">
+          <div className="flex flex-wrap items-center justify-between gap-2 px-5 pt-5">
+            <h2 className="flex items-center gap-2 text-base">
+              <CourseIcon course={data.selectedCourseId} />
+              Docentes da turma
+            </h2>
+            <span className="rounded-full border border-line bg-canvas px-2 py-0.5 text-[10px] text-muted">
+              {period
+                ? `${data.courses.find((c) => c.id === data.selectedCourseId)?.code || ""} ${period}`
+                : "Todos os períodos"}
+            </span>
+          </div>
+          <div className="mt-5 flex justify-between px-5 pb-3 text-[10px] font-medium uppercase tracking-wider text-muted">
+            <span>Professor / disciplina</span>
+            <span>Aulas na semana</span>
+          </div>
+          {professors.length ? (
+            professors.map((p) => (
+              <button
+                key={p.id}
+                aria-pressed={selected?.id === p.id}
+                onClick={() => setParams({ period, professorId: p.id })}
+                className={`flex w-full items-center gap-3 border-y border-transparent border-b-line px-5 py-4 text-left transition ${selected?.id === p.id ? "border-l-[3px] border-l-emerald-500 bg-emerald-50 dark:bg-emerald-950/40" : "hover:bg-canvas"}`}
+              >
+                <span
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-full text-sm font-bold ${selected?.id === p.id ? "bg-action text-white" : "bg-canvas text-brand"}`}
+                >
+                  {p.name[0]}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <strong className="text-[13px]">{p.name}</strong>
+                  <small className="mt-1 block truncate text-[11px] text-muted">
+                    {[
+                      ...new Set(
+                        lessons
+                          .filter((l) => hasTeacher(l, p.id))
+                          .map((l) => resolve(data, l).subject?.code),
+                      ),
+                    ].join(" • ")}
+                  </small>
+                </span>
+                <span className="text-right text-[11px] font-medium text-muted">
+                  {[
+                    ...new Set(
+                      lessons
+                        .filter((l) => hasTeacher(l, p.id))
+                        .map((l) => days[l.weekday - 1].slice(0, 3)),
+                    ),
+                  ].join(" • ")}
+                </span>
+                <Icon name="right" size={16} />
+              </button>
+            ))
+          ) : (
+            <Empty>
+              Nenhum professor corresponde aos filtros selecionados.
+            </Empty>
+          )}
+          <p className="border-t border-line bg-surface px-5 py-3 text-[10px] text-muted">
+            {data.courses.find((c) => c.id === data.selectedCourseId)?.name}{" "}
+            {period ? `• ${period}º período` : ""}
+          </p>
+        </Card>
+        {selected && (
+          <Card className="!p-5 lg:sticky lg:top-5">
+            <div className="mb-4 flex items-center gap-4 border-b border-line pb-4">
+              <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-action text-sm font-bold text-white">
+                {selected.name[0]}
+              </span>
+              <div>
+                <h2 className="text-base">{selected.name}</h2>
+                <p className="mt-1 text-[11px] text-muted">
+                  Docente •{" "}
+                  {
+                    data.courses.find((c) => c.id === data.selectedCourseId)
+                      ?.code
+                  }{" "}
+                  {period}
+                </p>
+              </div>
+            </div>
+            {(selected.qualification ||
+              selected.description ||
+              /^https?:\/\/lattes\.cnpq\.br\/[0-9]{16}\/?$/.test(
+                selected.lattesUrl || "",
+              )) && (
+              <div className="mb-5 space-y-2 border-b border-line pb-4">
+                {selected.qualification && (
+                  <p className="flex items-center gap-2 text-xs font-medium text-brand">
+                    <Icon name="graduation" size={16} />
+                    {selected.qualification}
+                  </p>
+                )}
+                {selected.description && (
+                  <p className="text-xs leading-5 text-muted">
+                    {selected.description}
+                  </p>
+                )}
+                {/^https?:\/\/lattes\.cnpq\.br\/[0-9]{16}\/?$/.test(
+                  selected.lattesUrl || "",
+                ) && (
+                  <a
+                    href={selected.lattesUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs font-semibold text-brand hover:underline"
+                  >
+                    Currículo Lattes
+                    <Icon name="open" size={14} />
+                    <span className="sr-only">(abre em nova aba)</span>
+                  </a>
+                )}
+              </div>
+            )}
+            <h3 className="text-[13px]">Agenda do período consultado</h3>
+            <p className="mb-4 mt-1 text-[11px] text-muted">
+              Aulas recorrentes
+            </p>
+            <div className="space-y-3">
+              {selectedLessons.map((l) => {
+                const { subject, room, group } = resolve(data, l);
+                return (
+                  <Link
+                    key={l.id}
+                    to={`/aulas/${l.id}?courseId=${data.selectedCourseId}&period=${group?.period}`}
+                    className="group block rounded-xl border border-line bg-canvas p-4 transition hover:border-muted hover:shadow-card"
+                  >
+                    <p className="text-[11px] text-muted">
+                      {days[l.weekday - 1]} • {subject?.code}
+                    </p>
+                    <strong className="my-2 block text-xl tabular-nums text-brand">
+                      {l.startTime}–{l.endTime}
+                    </strong>
+                    <span className="flex items-center gap-1.5 text-[11px] font-medium text-brand">
+                      <RoomIcon room={room} size={16} />
+                      {room?.name || "Sala não informada"}
+                      <span className="ml-auto transition-transform group-hover:translate-x-0.5">
+                        <Icon name="open" size={14} />
+                      </span>
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+      </div>
+    </>
+  );
 }

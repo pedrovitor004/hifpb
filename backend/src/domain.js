@@ -46,7 +46,26 @@ const schemas = {
   professors: z
     .object({
       name: text,
-      roomId: id.nullable().optional(),
+      qualification: z
+        .enum([
+          "",
+          "Graduação",
+          "Especialização",
+          "Mestrado",
+          "Doutorado",
+          "Pós-doutorado",
+        ])
+        .default(""),
+      lattesUrl: z
+        .string()
+        .trim()
+        .max(200)
+        .refine(
+          (value) =>
+            !value || /^https?:\/\/lattes\.cnpq\.br\/[0-9]{16}\/?$/.test(value),
+          "Informe um endereço válido do currículo Lattes com os 16 dígitos de identificação.",
+        )
+        .default(""),
       description: z.string().max(1000).default(""),
     })
     .strict(),

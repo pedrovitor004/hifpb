@@ -16,7 +16,6 @@ function references(type, data, all) {
     return record;
   };
   if (data.courseId) find("courses", data.courseId);
-  if (type === "professors" && data.roomId) find("rooms", data.roomId);
   if (type === "lessons") {
     const groups = ids(data, "classId").map((id) => find("classes", id));
     const subjects = ids(data, "subjectId").map((id) => find("subjects", id));
