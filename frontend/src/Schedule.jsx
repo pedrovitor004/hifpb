@@ -52,6 +52,7 @@ export default function Schedule() {
   const [list, setList] = useState(false),
     [selectedNotice, setSelectedNotice] = useState(null),
     [customSelection, setCustomSelection] = useState(null);
+  const [fullName, setFullName] = useState("");
   const courseId = data.selectedCourseId || params.get("courseId") || "";
   const groups = data.classes.filter((group) => group.courseId === courseId);
   const period = params.get("period");
@@ -188,6 +189,20 @@ export default function Schedule() {
           aria-label="Selecionar matérias"
           className="no-print mb-5 rounded-card border border-line bg-panel p-4 sm:p-5"
         >
+          <label className="mb-5 max-w-lg">
+            Seu nome completo (opcional)
+            <input
+              autoComplete="name"
+              maxLength={200}
+              value={fullName}
+              onChange={(event) => setFullName(event.target.value)}
+              placeholder="Nome que aparecerá no seu horário impresso"
+            />
+            <span className="text-[11px] font-normal leading-5 text-muted">
+              Aparece na grade e na impressão ou PDF. Não altera o horário
+              publicado.
+            </span>
+          </label>
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-base">
@@ -307,6 +322,14 @@ export default function Schedule() {
             </Button>
           </div>
         </div>
+      )}
+      {customized && fullName.trim() && (
+        <p
+          className="mb-4 break-words text-base font-semibold text-brand"
+          data-testid="schedule-owner"
+        >
+          Horário de {fullName.trim()}
+        </p>
       )}
       {!groups.length ? (
         <Empty>Os horários deste curso ainda não foram disponibilizados.</Empty>

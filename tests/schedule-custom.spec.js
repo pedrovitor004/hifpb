@@ -137,6 +137,10 @@ test("personalizado combina turmas, sinaliza conflitos e imprime somente a sele�
     .getByRole("button", { name: "Personalizar horário", exact: true })
     .click();
   const selection = page.getByRole("region", { name: "Selecionar matérias" });
+  await page.getByLabel(/Seu nome completo/).fill("Maria Oliveira Santos");
+  await expect(page.getByTestId("schedule-owner")).toHaveText(
+    "Horário de Maria Oliveira Santos",
+  );
   await expect(selection.getByRole("checkbox", { checked: true })).toHaveCount(
     2,
   );
@@ -157,6 +161,10 @@ test("personalizado combina turmas, sinaliza conflitos e imprime somente a sele�
   await expect(page.locator(".schedule-grid")).not.toContainText("PORT");
   await page.emulateMedia({ media: "print" });
   await expect(selection).toBeHidden();
+  await expect(page.getByTestId("schedule-owner")).toBeVisible();
+  await expect(page.getByTestId("schedule-owner")).toContainText(
+    "Maria Oliveira Santos",
+  );
   await expect(
     page.getByRole("heading", {
       name: "Meu horário personalizado",

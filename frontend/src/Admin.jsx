@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate, Link, useNavigate } from "react-router-dom";
 import { api } from "./firebase";
 import { useData } from "./App";
 import {
@@ -23,6 +23,7 @@ import {
 } from "./components";
 import Modal from "./Modal";
 import CalendarAdmin from "./CalendarAdmin";
+import ChangeNotice from "./ChangeNotice";
 import {
   categories,
   categoryOf,
@@ -120,6 +121,7 @@ const defaults = {
 };
 export default function Admin() {
   const data = useData();
+  const navigate = useNavigate();
   const [profile, setProfile] = useState(null),
     [failure, setFailure] = useState(""),
     [tab, setTab] = useState(() =>
@@ -133,8 +135,8 @@ export default function Admin() {
     [original, setOriginal] = useState(""),
     [editing, setEditing] = useState(null),
     [busy, setBusy] = useState(false),
-    [drafts, setDrafts] = useState([]),
-    [publishNotice, setPublishNotice] = useState(false);
+    [drafts, setDrafts] = useState([]);
+  const [changeNotice, setChangeNotice] = useState(null);
   const [search, setSearch] = useState(""),
     [period, setPeriod] = useState("");
   const [filtersCleared, setFiltersCleared] = useState(false);
@@ -174,6 +176,43 @@ export default function Admin() {
         .includes(search.toLowerCase()),
   );
   const dirty = form && JSON.stringify(form) !== original;
+  const managedCourses = data.courses.filter(
+    (course) =>
+      !profile.courseIds?.length || profile.courseIds.includes(course.id),
+  );
+  const setupCourse =
+    managedCourses.find(
+      (course) =>
+        data.classes.some((item) => item.courseId === course.id) &&
+        data.subjects.some((item) => item.courseId === course.id),
+    ) || managedCourses[0];
+  const preparation = [
+    {
+      tab: "courses",
+      title: "Curso",
+      detail: "Cadastre o curso que receberá o horário.",
+      ready: Boolean(setupCourse),
+    },
+    {
+      tab: "classes",
+      title: "Turmas",
+      detail: "Vincule as turmas ao curso e informe o período.",
+      ready: Boolean(
+        setupCourse &&
+        data.classes.some((item) => item.courseId === setupCourse.id),
+      ),
+    },
+    {
+      tab: "subjects",
+      title: "Disciplinas",
+      detail: "Cadastre as disciplinas vinculadas ao curso.",
+      ready: Boolean(
+        setupCourse &&
+        data.subjects.some((item) => item.courseId === setupCourse.id),
+      ),
+    },
+  ];
+  const canCreateLesson = preparation.every((step) => step.ready);
   async function close() {
     if (busy) return;
     if (
@@ -194,9 +233,7 @@ export default function Admin() {
       ]),
     );
     if (!record) {
-      const course = data.courses.find(
-        (c) => !profile.courseIds?.length || profile.courseIds.includes(c.id),
-      );
+      const course = setupCourse;
       if (clean.courseId !== undefined) clean.courseId = course?.id || "";
       if (type === "lessons") {
         const today = new Date().toLocaleDateString("en-CA");
@@ -215,7 +252,6 @@ export default function Admin() {
     setShowDetails(false);
     setForm(clean);
     setOriginal(JSON.stringify(clean));
-    setPublishNotice(false);
   }
   async function run(action) {
     if (busy) return;
@@ -263,11 +299,26 @@ export default function Admin() {
           body.subjectIds = origin.subjectIds;
       }
       const path = type === "lessons" ? "/drafts" : "/" + type;
-      await api(path + (editing ? "/" + editing : ""), {
+      const saved = await api(path + (editing ? "/" + editing : ""), {
         method: editing ? "PUT" : "POST",
         body: JSON.stringify(body),
       });
       setForm(null);
+      if (type === "lessons") {
+        setSearch("");
+        setPeriod("");
+      }
+      if (type !== "notices")
+        offerNotice(
+          type,
+          { ...body, id: saved.id || editing },
+          type === "lessons"
+            ? "Rascunho salvo (ainda não publicado)"
+            : editing
+              ? "Cadastro atualizado"
+              : "Cadastro criado",
+          type === "lessons",
+        );
       success(
         type === "lessons"
           ? "Rascunho salvo. Revise e publique na aba Rascunhos."
@@ -285,19 +336,12 @@ export default function Admin() {
     )
       return;
     await run(async () => {
-      const notice = publishNotice
-        ? {
-            title: "Alteração de horário",
-            message: `A grade da turma ${data.classes.find((c) => c.id === record.classId)?.name || record.classId} foi atualizada. Consulte os horários publicados.`,
-            category: "alteracao",
-            courseId: record.courseId,
-          }
-        : undefined;
       await api(`/drafts/${record.id}/publish`, {
         method: "POST",
-        body: JSON.stringify({ notice }),
+        body: JSON.stringify({}),
       });
       setForm(null);
+      offerNotice("lessons", record, "Horário publicado");
       success("Horário publicado com sucesso.");
     });
   }
@@ -312,8 +356,81 @@ export default function Admin() {
       return;
     await run(async () => {
       await api(`/${tab}/${record.id}`, { method: "DELETE" });
+      if (type !== "notices")
+        offerNotice(
+          type,
+          record,
+          tab === "drafts"
+            ? "Rascunho descartado (o horário publicado foi preservado)"
+            : "Registro excluído",
+        );
       success(tab === "drafts" ? "Rascunho descartado." : "Registro excluído.");
     });
+  }
+  function offerNotice(collection, record, action, redirect = false) {
+    const previous = data[collection]?.find((item) => item.id === record.id);
+    const related = [...data.lessons, ...drafts].filter((lesson) =>
+      collection === "professors"
+        ? [lesson.professorId, ...(lesson.professorIds || [])].includes(
+            record.id,
+          )
+        : collection === "rooms"
+          ? lesson.roomId === record.id
+          : false,
+    );
+    const ids = new Set(
+      [
+        record.courseId,
+        previous?.courseId,
+        ...(previous?.courseIds || []),
+        ...(record.courseIds || []),
+        ...(collection === "courses" && action !== "Registro excluído"
+          ? [record.id]
+          : []),
+        ...related.flatMap((lesson) => [
+          lesson.courseId,
+          ...(lesson.courseIds || []),
+        ]),
+      ].filter(Boolean),
+    );
+    const available =
+      collection === "courses" && action === "Registro excluído"
+        ? []
+        : collection === "calendars"
+          ? managedCourses.filter(
+              (course) =>
+                record.scope === "todos" ||
+                {
+                  superior: "superiores",
+                  integrado: "integrados",
+                  tecnico: "tecnicos",
+                }[course.level || "superior"] === record.scope,
+            )
+          : ids.size
+            ? managedCourses.filter((course) => ids.has(course.id))
+            : managedCourses.filter(
+                (course) =>
+                  !(collection === "courses" && course.id === record.id),
+              );
+    if (
+      collection === "courses" &&
+      action !== "Registro excluído" &&
+      !available.some((course) => course.id === record.id)
+    )
+      available.push(record);
+    const subject = data.subjects.find((item) => item.id === record.subjectId);
+    const detail =
+      record.name || record.title || subject?.name || "programação acadêmica";
+    setChangeNotice({
+      courses: available,
+      message: `${action}: ${detail}.`,
+      redirect,
+    });
+  }
+  function closeChangeNotice() {
+    const redirect = changeNotice?.redirect;
+    setChangeNotice(null);
+    if (redirect) navigate("/admin?tab=drafts");
   }
   const title =
     tab === "lessons"
@@ -324,6 +441,9 @@ export default function Admin() {
   const currentDraft = drafts.find((d) => d.id === editing);
   return (
     <>
+      {changeNotice && (
+        <ChangeNotice change={changeNotice} onClose={closeChangeNotice} />
+      )}
       <div className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <Title
           badge={false}
@@ -339,7 +459,12 @@ export default function Admin() {
         </Link>
       </div>
       {tab === "calendars" ? (
-        <CalendarAdmin profile={profile} />
+        <CalendarAdmin
+          profile={profile}
+          onChanged={(record) =>
+            offerNotice("calendars", record, "Calendário atualizado")
+          }
+        />
       ) : (
         <>
           <Card className="!p-0 overflow-hidden">
@@ -353,11 +478,38 @@ export default function Admin() {
                     : "registros encontrados"}
                 </p>
               </div>
-              <Button onClick={() => edit(null)}>
+              <Button
+                disabled={type === "lessons" && !canCreateLesson}
+                onClick={() => edit(null)}
+              >
                 <Icon name="plus" />
-                Novo registro
+                {type === "lessons"
+                  ? "Novo horário"
+                  : `Cadastrar ${catalogs[type][0].toLowerCase()}`}
               </Button>
             </div>
+            {type === "lessons" && !canCreateLesson && (
+              <p
+                role="status"
+                className="border-b border-line px-5 py-3 text-xs leading-5 text-muted"
+              >
+                Para criar um horário, prepare os cadastros:{" "}
+                {preparation
+                  .filter((step) => !step.ready)
+                  .map((step, index) => (
+                    <React.Fragment key={step.tab}>
+                      {index > 0 && ", "}
+                      <Link
+                        className="font-semibold text-brand underline"
+                        to={`/admin?tab=${step.tab}`}
+                      >
+                        {step.title.toLowerCase()}
+                      </Link>
+                    </React.Fragment>
+                  ))}
+                .
+              </p>
+            )}
             <div className="flex flex-wrap items-end gap-3 border-b border-line bg-surface px-5 py-4">
               <label className="min-w-0 flex-1 sm:max-w-sm">
                 Buscar registro
@@ -908,27 +1060,6 @@ export default function Admin() {
                   </div>
                 )}
               </form>
-              {currentDraft && type === "lessons" && (
-                <label className="mt-5 flex-row items-start rounded-xl border border-line p-4">
-                  <input
-                    className="mt-0.5 w-auto accent-emerald-700"
-                    type="checkbox"
-                    checked={publishNotice}
-                    onChange={(e) => setPublishNotice(e.target.checked)}
-                  />
-                  <span>
-                    <strong className="text-xs">
-                      Publicar também um aviso de alteração
-                    </strong>
-                    <span className="mt-1 block text-[11px] leading-5 text-muted">
-                      O horário e o aviso serão publicados juntos.{" "}
-                      {dirty
-                        ? "Salve as alterações para habilitar a publicação."
-                        : ""}
-                    </span>
-                  </span>
-                </label>
-              )}
             </Modal>
           )}
         </>

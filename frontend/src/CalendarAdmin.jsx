@@ -28,7 +28,7 @@ const fileBase64 = (file) =>
     reader.onerror = () => reject(new Error("Não foi possível ler o arquivo."));
     reader.readAsDataURL(file);
   });
-export default function CalendarAdmin({ profile }) {
+export default function CalendarAdmin({ profile, onChanged }) {
   const data = useData();
   const [scope, setScope] = useState("superiores");
   const calendar = currentCalendar(data.calendars, scope);
@@ -95,6 +95,7 @@ export default function CalendarAdmin({ profile }) {
         },
       );
       await data.load();
+      onChanged?.(body);
       success(
         "Calendário publicado. O PDF e os links já estão disponíveis para os alunos.",
       );
